@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: taxservice
+  profiles:
+    active: LOCAL
+  cloud:
+    config:
+      uri: http://localhost:12777
+server:
+  port: 12789
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:12761/eureka/
+---
+spring:
+  profiles: docker
+  cloud:
+    config:
+      uri: http://config-service:12777
+---
+spring:
+  profiles: default
+  cloud:
+    config:
+      uri: http://localhost:12787
