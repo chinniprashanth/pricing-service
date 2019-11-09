@@ -1,11 +1,11 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: coc-shopping-cartservice
+  name: coc-pricing-service
   #namespace: default TODO: Update the namespace.
   labels:
-    run: coc-shopping-cartservice
-    app: coc-shopping-cartservice
+    run: coc-pricing-service
+    app: coc-pricing-service
 spec:
   replicas: 1 # TODO: Update the no of replicas
   strategy:
@@ -13,18 +13,18 @@ spec:
   template:
     metadata:
       labels:
-        run: coc-shopping-cartservice
-        app: coc-shopping-cartservice
+        run: coc-pricing-service
+        app: coc-pricing-service
     spec:
       containers:
-        - name: coc-shopping-cartservice
-          image: gcr.io/cognitive-genie-63754/coc_shopping-cartservice:latest # TODO: Change the image url
+        - name: coc-pricing-service
+          image: gcr.io/cognitive-genie-63754/coc_coc-pricing-service:latest # TODO: Change the image url
           imagePullPolicy: Always # TODO: Change it to IfNotPresent once CD setup done on cloud
           ports:
-            - containerPort: 12786
+            - containerPort: 12789
           env:
           - name: eureka_instance_hostname
-            value: 'shoppingcarservice'
+            value: 'pricingservice'
           - name: MY_POD_NAME
             valueFrom:
               fieldRef:
@@ -45,13 +45,13 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: coc-shopping-cartservice
+  name: coc-pricing-service
   #namespace: default #TODO: Make the namespace parameterized.
 spec:
   scaleTargetRef:
     apiVersion: apps/v1beta1
     kind: Deployment
-    name: coc-shopping-cartservice
+    name: coc-pricing-service
   minReplicas: 1 # TODO: Update the no of minReplicas
   maxReplicas: 1 # TODO: Update the no of maxReplicas
   targetCPUUtilizationPercentage: 80
