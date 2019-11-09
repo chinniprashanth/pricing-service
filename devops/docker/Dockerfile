@@ -34,7 +34,7 @@ COPY target/coc-pricing-service-*.jar /tmp
 
 VOLUME  ["/sys/fs/cgroup"]
 VOLUME  ["/usr/java/jdk1.8.0_141"]
-EXPOSE 12786
+EXPOSE 12789
 CMD ["/bin/bash"]
 
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar /tmp/coc--pricing-service-*.jar" ]
