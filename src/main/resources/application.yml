@@ -1,5 +1,16 @@
 spring:
   application:
-    name: taxservice
+    name: pricing-service
   main:
     allow-bean-definition-overriding: true
+logging:
+  level:
+    com:
+      sapient:
+        coc:
+          application:
+            cartservice:
+              feign:
+                clients:
+                  ProductInfoServiceClient: debug
+                  CartInfoServiceClient: debug

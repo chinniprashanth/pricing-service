@@ -1,11 +1,65 @@
+
 spring:
   application:
-    name: taxservice
+    name: pricing-service
   profiles:
     active: LOCAL
   cloud:
     config:
       uri: http://localhost:12777
+  mail:
+    host: in-v3.mailjet.com
+    port: 587
+    username: 4adb855d0c680bdd368c2c4b4910b1ab
+    password: 6d6263d1999db9a25a671053cc13a24d
+    protocol: smtp
+    defaultEncoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  main:
+    allow-bean-definition-overriding: true
+  cache:
+    type: redis
+  redis:
+    channelName: coc-core-channel
+    host: localhost
+    port: 6379
+    password:
+    maxTotal: 5
+    readTimeout: 2
+    connectTimeout: 2
+  kafka:
+    groupId: coregrp
+    consumerFactory: kafkaListenerContainerFactory
+    email:
+      consumerFactory: emailConsumerFactory
+      topic:
+        name: emailTopic
+    bootstrapAddress: localhost:9092
+    batch:
+      size: 16384
+    acks: all
+    auto:
+      commit:
+        interval:
+          ms: 1000
+        enable: false
+    retries: 0
+    consumer:
+      timeout:
+        ms: 1000
+    max:
+      poll:
+        records: 1
+  sleuth:
+    sampler:
+      probability: 1
+    enabled: true
+    trace-id128: true
 server:
   port: 12789
 eureka:
@@ -15,7 +69,56 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://localhost:12761/eureka/
+      defaultZone: http://localhost:12761/eureka/ 
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  
+      password: 1234 #the password which apps will use to access its configurations
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,httptrace,metrics,threaddump,mappings,bus-refresh
+swagger:
+  api:
+    title: API documentation Services
+    description: API documentation Services
+    contact: Ashish Abrol
+    licence: Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+    version: 1
+    url:
+      pattern: /v1
+    terms:
+      url: http://www.sapient.com
+  contact: SapientRazorfish
+  licence.url: https://github.com/springfox/springfox/blob/master/LICENSE
+  version: 2.0
+feign:
+  maxAttempts: 1
+  custom:
+    max_retry_count: 3
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 50000
+        readTimeout: 50000
+        loggerLevel: full
+zookeeper:
+  sync:
+    time:
+      ms: 2000
+cassandra:
+  contactpoints: localhost
+  port: 9042
+  keyspace: CoC
+  basePackages: com.sapient.coc.application
+
+
+
 ---
 spring:
   profiles: docker

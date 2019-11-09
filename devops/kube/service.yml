@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: coc-shopping-cartservice
+  #namespace: default #TODO: Make the namespace parameterized.
+  labels:
+    app: coc-shopping-cartservice
+spec:
+  ports:
+    - name: app-port
+      protocol: TCP
+      port: 12786
+      targetPort: 12786
+  selector:
+    app: coc-shopping-cartservice
+  type: LoadBalancer # TODO: Change it to NodePort on cloud
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster   
