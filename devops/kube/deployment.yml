@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: coc-pricing-service
-          image: gcr.io/cognitive-genie-63754/coc_coc-pricing-service:latest # TODO: Change the image url
+          image: gcr.io/cognitive-genie-63754/coc-pricing-service:latest # TODO: Change the image url
           imagePullPolicy: Always # TODO: Change it to IfNotPresent once CD setup done on cloud
           ports:
             - containerPort: 12789
