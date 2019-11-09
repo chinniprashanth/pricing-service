@@ -1,46 +1,54 @@
-kind: Deployment
 apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
   name: coc-pricing-service
   #namespace: default TODO: Update the namespace.
   labels:
-    run: coc-pricing-service
     app: coc-pricing-service
 spec:
   replicas: 1 # TODO: Update the no of replicas
   strategy:
     type: Recreate # TODO: Update the strategy
+  selector:
+    matchLabels:
+      app: coc-pricing-service
   template:
     metadata:
+      name: coc-pricing-service
       labels:
-        run: coc-pricing-service
         app: coc-pricing-service
     spec:
       containers:
         - name: coc-pricing-service
-          image: gcr.io/cognitive-genie-63754/coc-pricing-service:latest # TODO: Change the image url
+          image: gcr.io/cognitive-genie-63754/coc_pricing-service:latest # TODO: Change the image url
           imagePullPolicy: Always # TODO: Change it to IfNotPresent once CD setup done on cloud
           ports:
             - containerPort: 12789
           env:
-          - name: eureka_instance_hostname
-            value: 'pricingservice'
-          - name: MY_POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: 'coc-pricing-service'
+#            - name: SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME
+#              valueFrom:
+#                secretKeyRef:
+#                  name: git-user-credential 
+#                  key: git-username
+#            - name: SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD
+#             valueFrom:
+#                secretKeyRef:
+#                  name: git-user-credential
+#                  key: git-password
           securityContext:
             privileged: false
 #          envFrom:
 #            - configMapRef:
-#                name: coc-config            
+#                name: coc-config
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
-      schedulerName: default-scheduler
       imagePullSecrets:
-        - name: acr-coc            
+        - name: acr-coc
+      schedulerName: default-scheduler
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
@@ -55,3 +63,4 @@ spec:
   minReplicas: 1 # TODO: Update the no of minReplicas
   maxReplicas: 1 # TODO: Update the no of maxReplicas
   targetCPUUtilizationPercentage: 80
+
