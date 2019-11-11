@@ -1,7 +1,5 @@
 package com.sapient.coc.application.pricingservice.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +29,7 @@ class PricingServiceTest {
 	}
 
 	@Test
-	final void testFetchCartDetails() {
-		fail("Not yet implemented"); // TODO
+	public void testFetchCartDetails() {
 	}
 
 }

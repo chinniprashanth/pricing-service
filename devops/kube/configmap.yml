@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-    name: shoppingcart-app-configs
+    name: pricingservice-app-configs
 data:
   LOGGING_LEVEL_ROOT: INFO
   SERVER_PORT: "8080"

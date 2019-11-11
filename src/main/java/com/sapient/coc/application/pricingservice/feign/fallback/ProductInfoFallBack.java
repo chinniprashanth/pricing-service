@@ -22,7 +22,7 @@ public class ProductInfoFallBack implements ProductInfoServiceClient {
 	@Override
 	public List<Sku> getProductDetailsForSapecificItems(String skuIds) {
 
-		return new ArrayList<>();
+		return new ArrayList<Sku>();
 	}
 
 	@Override

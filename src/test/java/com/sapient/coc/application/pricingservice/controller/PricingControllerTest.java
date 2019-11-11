@@ -12,11 +12,14 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
@@ -36,6 +40,8 @@ import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceCl
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
 import com.sapient.coc.application.pricingservice.service.impl.PricingServiceImpl;
 
+@RunWith(SpringRunner.class)
+@WebMvcTest(value = PricingController.class, secure = false)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PricingControllerTest {
 
@@ -71,6 +77,10 @@ public class PricingControllerTest {
 	private static JSONObject requestParams;
 	private List<OrderItem> items;
 	private static String token;
+
+	@BeforeAll
+	static void setUpBeforeClass() throws Exception {
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -109,8 +119,28 @@ public class PricingControllerTest {
 		when(pricingService.fetchCartDetails(token, "100")).thenReturn(cartResposne);
 		when(pricingService.applyPromotions(token, "100")).thenReturn(orderResponse);
 		this.mvc.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", token)
-				.content(requestParams.toString())).andExpect(status().is2xxSuccessful());
+				.header("Authorization", token).content(requestParams.toString()))
+				.andExpect(status().is2xxSuccessful());
+	}
+
+	@Test
+	public void testApplyItemPromotionForGivenItems_null() throws Exception {
+
+		requestParams = new JSONObject();
+		requestParams.put("cartId", null);
+		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
+		when(pricingService.applyPromotions(token, null)).thenReturn(null);
+		this.mvc.perform(get("/pricing/items/null")).andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testApplyItemPromotionForGivenItems_empty() throws Exception {
+
+		requestParams = new JSONObject();
+		requestParams.put("cartId", "");
+		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
+		when(pricingService.applyPromotions(token, null)).thenReturn(null);
+		this.mvc.perform(get("/pricing/items/")).andExpect(status().is4xxClientError());
 	}
 
 }

@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: coc-pricing-serviceroute
+  name: pricingserviceroute
 spec:
   hosts:
   - "*"
@@ -10,12 +10,12 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /shopping
+        prefix: /pricing
     route:
     - destination:
         host: coc-pricing-service
         port:
-          number: 5556
+          number: 12789
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -23,11 +23,11 @@ metadata:
   name: coc-pricing-service
 spec:
   hosts:
-  - shopping-cartservice
+  - coc-pricing-service
   http:
   - route:
     - destination:
-        host: shopping-cartservice
+        host: coc-pricing-service
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
