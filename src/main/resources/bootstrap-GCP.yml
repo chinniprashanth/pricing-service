@@ -20,7 +20,7 @@ spring:
       topic:
         name: pricingTopic
 server:
-  port: 12786
+  port: 12789
   
 cassandra:
   keyspace: CoC_Cart
