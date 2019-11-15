@@ -66,7 +66,7 @@ public class PricingServiceImpl implements PricingService {
 		itemDetails.forEach(itemDetail -> {
 			OrderItem orderItem = new OrderItem();
 			orderItem.setQty(qtySkuId.get(itemDetail.getId()));
-			
+			orderItem.setItemId(itemDetail.getId());
 			orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 			orderItem.setListPrice(new Double(itemDetail.getListprice()));
 			orderItem.setSkuId(itemDetail.getId());
