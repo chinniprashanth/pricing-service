@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -18,20 +17,14 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
@@ -85,7 +78,7 @@ public class PricingControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		this.mvc = MockMvcBuilders.standaloneSetup(pricingController).build();
-		token = "Bearer " + obtainAccessToken();
+		token = "Bearer zxczxczczxczxczxczxc";
 
 		orderResponse = new OrderResponse();
 		cartResposne = new CartResponse();
@@ -95,20 +88,6 @@ public class PricingControllerTest {
 		cartResposne.setItems(items);
 		orderResponse.setItem(cartResposne);
 
-	}
-
-	private String obtainAccessToken() throws Exception {
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.add("Authorization", "Basic d2ViLWNsaWVudDp3ZWItY2xpZW50LXNlY3JldA==");
-
-		HttpEntity<String> entity = new HttpEntity<>("body", headers);
-		String url = "http://localhost:8080/auth-service/oauth/token?password=user&username=user&grant_type=password";
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-		String resultString = response.getBody();
-		JacksonJsonParser jsonParser = new JacksonJsonParser();
-		return jsonParser.parseMap(resultString).get("access_token").toString();
 	}
 
 	@Test
