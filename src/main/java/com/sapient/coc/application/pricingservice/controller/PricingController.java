@@ -42,19 +42,34 @@ public class PricingController {
 	@RequestMapping(value = "/items/{cartId}", method = RequestMethod.GET, produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Applied given promotion for given items", response = ResponseEntity.class),
-			@ApiResponse(code = 400, message = "Bad Request | Sku not found") })
-	@ApiOperation(value = "${applyItemPromotionForGivenItems.ApiOperation.value}", notes = "${applyItemPromotionForGivenItems.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
+			@ApiResponse(code = 400, message = "Bad Request | cart not found") })
+	@ApiOperation(value = "${applyItemPricing.ApiOperation.value}", notes = "${applyItemPricing.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
 			"Pricing Service" })
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
-	public ResponseEntity<OrderResponse> applyItemPromotionForGivenItems(
+	public ResponseEntity<OrderResponse> applyItemPricing(
 			@RequestHeader("Authorization") String authorization,
-			@ApiParam(value = "Cart Id for which Promotions need to be applied", required = true) @PathVariable String cartId) {
-		logger.info("Entering the applyItemPromotionForGivenItems method in PricingController for cart id {}", 0);
+			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId) {
+		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
 		if (cartId == null || cartId.isEmpty())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		OrderResponse price = pricingService.applyPromotions(authorization, cartId);
-		logger.info("End the applyItemPromotionForGivenItems method in PricingController {}", 0);
+		logger.info("End the applyItemPricing method in PricingController {}", 0);
+		return new ResponseEntity<>(price, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/items/shipping", method = RequestMethod.GET, produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Applied given promotion for given items", response = ResponseEntity.class),
+			@ApiResponse(code = 400, message = "Bad Request | order not found") })
+	@ApiOperation(value = "${applyShippingPricing.ApiOperation.value}", notes = "${applyShippingPricing.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
+			"Pricing Service" })
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
+	public ResponseEntity<OrderResponse> applyShippingPricing(@RequestHeader("Authorization") String authorization) {
+		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
+		OrderResponse price = pricingService.calculateShipping(authorization);
+		logger.info("End the applyItemPricing method in PricingController {}", 0);
 		return new ResponseEntity<>(price, HttpStatus.OK);
 	}
 
