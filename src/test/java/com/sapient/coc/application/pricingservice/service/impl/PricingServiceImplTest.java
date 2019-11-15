@@ -1,34 +1,25 @@
 package com.sapient.coc.application.pricingservice.service.impl;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
@@ -36,26 +27,13 @@ import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
+import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
-import com.sapient.coc.application.pricingservice.feign.fallback.CartInfoServiceFallBack;
-import com.sapient.coc.application.pricingservice.feign.fallback.ProductInfoFallBack;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
-/*@RunWith(SpringRunner.class)
-
-  @RunWith(SpringRunner.class)
-  
-  @WebMvcTest(value = PricingServiceImpl.class, secure = false)*/
-/*@RunWith(SpringRunner.class)
-
+@RunWith(SpringRunner.class)
 @WebMvcTest(value = PricingServiceImpl.class, secure = false)
-
-@WebMvcTest(value = PricingServiceImpl.class, secure = false)
-
-@RunWith(SpringRunner.class)*/
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringBootTest
 public class PricingServiceImplTest {
 
 	private static Logger logger = LoggerFactory.getLogger(PricingServiceImplTest.class);
@@ -63,84 +41,46 @@ public class PricingServiceImplTest {
 	@InjectMocks
 	private PricingService pricingService = new PricingServiceImpl();
 
-	@Mock
-	private ProductInfoServiceClient productInfoServiceClient;
+	@MockBean
+	private CartInfoServiceClient cartInfoServiceClients;
 
-	@Mock
-	private CartInfoServiceFallBack cartInfoServiceFallBack;
+	@MockBean
+	private ProductInfoServiceClient productInfoServiceClients;
 
-	@Mock
-	private ProductInfoFallBack productInfoFallBack;
+	@MockBean
+	private FulfillmentServiceClient fulfillmentServiceClient;
 
-	@Mock
-	private CartInfoServiceClient cartInfoServiceClient = new CartInfoServiceFallBack();
+	private CartResponse orderResponse = null;
 
-	private static String token;
-
-	/*
-	 * @Autowired PricingService pricingService;
-	 */
-
-	private CartItem data[];
-
-	@Mock
+	@MockBean
 	private CartResp cartResp;
-	private List<OrderItem> items;
 
+	private List<OrderItem> items;
+	private static String token;
+	private CartItem data[];
 	private List<Sku> skuList;
 
 	@Mock
 	private CartResponse result;
-
-	@Autowired
-	private MockMvc mvc;
-
-	@TestConfiguration
-	static class PricingServiceImplConfiguration {
-
-		@Bean
-		public PricingService PricingServiceImpl() {
-			return new PricingServiceImpl();
-		}
-	}
-
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-
 	}
 
-	@BeforeEach
-	void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
+
 	}
 
-	private String obtainAccessToken() throws Exception {
-
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.add("Authorization", "Basic d2ViLWNsaWVudDp3ZWItY2xpZW50LXNlY3JldA==");
-
-		HttpEntity<String> entity = new HttpEntity<>("body", headers);
-		String url = "http://localhost:8080/auth-service/oauth/token?password=user&username=user&grant_type=password";
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-		String resultString = response.getBody();
-		JacksonJsonParser jsonParser = new JacksonJsonParser();
-		return jsonParser.parseMap(resultString).get("access_token").toString();
-	}
 
 	@Test
-	public void testFetchCartDetails() {
-		try {
-			token = "Bearer " + obtainAccessToken();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void testApplyItemPromotionForGivenItems() throws Exception {
+
+		token = "Bearer asKJSSLKajslASasjlAS";
 		cartResp = new CartResp();
 		data = new CartItem[2];
 		CartItem cartItem = new CartItem();
-		cartItem.setSkuId("abc");
+		cartItem.setSkuId("100");
 		cartItem.setQuantity(2);
 		data[0] = cartItem;
 		data[1] = cartItem;
@@ -159,13 +99,13 @@ public class PricingServiceImplTest {
 		sku.setId("abc");
 		skuList.add(sku);
 
-		when(cartInfoServiceClient.getOrderDetails(token, "abc")).thenReturn(cartResp);
-		// when(productInfoFallBack.getProductDetailsForSapecificItems("abc");
-		// when(productInfoServiceClient.getProductDetailsForSapecificItems("abc")).thenReturn(skuList);
-		when(pricingService.fetchCartDetails(token, "abc")).thenReturn(result);
-		// CartResponse result = pricingService.fetchCartDetails(token, "abc");
-		Assert.assertEquals(result, result);
-		// assertNotNull(result);
+		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
+		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(skuList);
+
+		CartResponse result = pricingService.fetchCartDetails(token, "100");
+		assertNotNull(result);
 	}
+
+
 
 }

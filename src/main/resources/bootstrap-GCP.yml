@@ -20,10 +20,10 @@ spring:
       topic:
         name: pricingTopic
 server:
-  port: 12786
+  port: 12789
   
 cassandra:
-  keyspace: CoC_Cart
+  keyspace: CoC_Pricing
   basePackages: com.sapient.coc.application
 swagger:
   api:

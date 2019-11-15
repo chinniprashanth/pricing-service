@@ -1,9 +1,12 @@
 package com.sapient.coc.application.pricingservice.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 
 /**
@@ -28,11 +31,16 @@ public interface PricingService {
 	}
 	
 	// Map<String, List<OrderResponse>> applyShippingPromotion(String orderId);
+	// CartResponse applyShippingPricing(String orderId);
 
 	// Map<String, List<PromotionFact>> applyItemPromotionForGivenItems(List<String>
 	// skuIds, Integer buyQty);
 	
 	CartResponse fetchCartDetails(String token, String cartId);
+
+	List<OrderItem> fetchProductDetails(String skuId);
+
+	OrderResponse calculateShipping(String authorization);
 
 	// Map<String, List<PromotionFact>>
 	// applyCategoryAndItemPromotionForGivenItems(String skuIds, Integer buyQty);
