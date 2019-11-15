@@ -21,7 +21,8 @@ public class OrderItem implements Serializable {
 	private double salePrice;
 	private double itemsTotalPrice;
 	private double orderItemTax;
-	// private double totalTax;
+	private double shippingPrice;
+	private String shippingMethod;
 	// private double currentprice;
 	private double itemDiscountedPrice;
 	private double categoryDiscountedPrice;
@@ -191,5 +192,20 @@ public class OrderItem implements Serializable {
 				+ qty + "-" + listPrice + "-" + salePrice;
 	}
 
+	public double getShippingPrice() {
+		return shippingPrice;
+	}
+
+	public void setShippingPrice(double shippingPrice) {
+		this.shippingPrice = shippingPrice;
+	}
+
+	public String getShippingMethod() {
+		return shippingMethod;
+	}
+
+	public void setShippingMethod(String shippingMethod) {
+		this.shippingMethod = shippingMethod;
+	}
 
 }
