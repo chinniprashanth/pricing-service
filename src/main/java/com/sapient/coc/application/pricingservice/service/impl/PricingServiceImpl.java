@@ -66,7 +66,7 @@ public class PricingServiceImpl implements PricingService {
 		itemDetails.forEach(itemDetail -> {
 			OrderItem orderItem = new OrderItem();
 			orderItem.setQty(qtySkuId.get(itemDetail.getId()));
-			orderItem.setQty(2);
+			
 			orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 			orderItem.setListPrice(new Double(itemDetail.getListprice()));
 			orderItem.setSkuId(itemDetail.getId());
@@ -82,7 +82,7 @@ public class PricingServiceImpl implements PricingService {
 			orderItems.forEach(orderItem -> {
 				cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
 				cartResponse.setSubtotal(
-						orderItem.getItemDiscountedPrice() * orderItem.getQty() + cartResponse.getSubtotal());
+						orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal());
 			});
 		}
 		cartResponse.setItems(orderItems);
