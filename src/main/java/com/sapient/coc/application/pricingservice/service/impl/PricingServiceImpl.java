@@ -72,7 +72,8 @@ public class PricingServiceImpl implements PricingService {
 			orderItem.setSkuId(itemDetail.getId());
 			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
 			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQty());
-			orderItem.setProductId(itemDetail.getId());
+		
+			orderItem.setProductId(itemDetail.getParentproductid());
 			orderItem.setItemDescription(itemDetail.getDescription());
 			orderItem.setItemName(itemDetail.getName());
 			orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
