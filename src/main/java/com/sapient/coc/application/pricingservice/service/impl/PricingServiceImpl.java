@@ -103,7 +103,7 @@ public class PricingServiceImpl implements PricingService {
 		ResponseEntity<Fulfillment> fulfillmentResp =
 		  fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
 		Data fulfillmentData = fulfillmentResp.getBody().getData();
-		List<FulfillmentItem> itemList = fulfillmentData.getFulfillmentItems();
+		List<FulfillmentItem> itemList = fulfillmentData.getItems();
 		Map<String, ShippingResponse> shippingDetailsMap = new HashMap<String, ShippingResponse>();
 		Map<String, Double> priceMap = new HashMap<String, Double>();
 		List<String> skuIds = new ArrayList<String>();
@@ -126,14 +126,18 @@ public class PricingServiceImpl implements PricingService {
 		orderItems.forEach(orderItem -> {
 			orderItem.setShippingMethod(shippingDetailsMap.get(orderItem.getSkuId()).getShippingMethod());
 			orderItem.setShippingPrice(shippingDetailsMap.get(orderItem.getSkuId()).getShippingCost());
+			if (orderItem.getQty() == 0) {
+				orderItem.setQty(1);
+			}
 			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
 			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQty());
 
 			cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
 			cartResponse
 					.setSubtotal(orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal()
-							+ cartResponse.getShipping());
+					);
 		});
+		cartResponse.setSubtotal(cartResponse.getSubtotal() + total);
 		cartResponse.setItems(orderItems);
 		orderResp.setItem(cartResponse);
 		return orderResp;
@@ -145,13 +149,14 @@ public class PricingServiceImpl implements PricingService {
 		List<Sku> itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(skuId);
 		itemDetails.forEach(itemDetail -> {
 			OrderItem orderItem = new OrderItem();
+			orderItem.setItemId(itemDetail.getId());
 			orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 			orderItem.setListPrice(new Double(itemDetail.getListprice()));
 			orderItem.setSkuId(itemDetail.getId());
 			// orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
 			// orderItem.setItemDiscountedPrice(orderItem.getSalePrice() *
 			// orderItem.getQty());
-			orderItem.setProductId(itemDetail.getId());
+			orderItem.setProductId(itemDetail.getParentproductid());
 			orderItem.setItemDescription(itemDetail.getDescription());
 			orderItem.setItemName(itemDetail.getName());
 			orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
