@@ -17,8 +17,8 @@ public class Data {
 	private String orderStatus;
     @JsonProperty("userId")
 	private String userId;
-    @JsonProperty("orderItems")
-	private List<FulfillmentItem> fulfillmentItems;
+	@JsonProperty("items")
+	private List<FulfillmentItem> items;
     public void setId(String id) {
          this.id = id;
      }
@@ -58,17 +58,13 @@ public class Data {
 		this.userId = userId;
 	}
 
-	public List<FulfillmentItem> getFulfillmentItems() {
-		return fulfillmentItems;
+	public List<FulfillmentItem> getItems() {
+		return items;
 	}
 
-	public void setFulfillmentItems(List<FulfillmentItem> fulfillmentItems) {
-		this.fulfillmentItems = fulfillmentItems;
+	public void setItems(List<FulfillmentItem> items) {
+		this.items = items;
 	}
-
-
-
-
 
 
 
