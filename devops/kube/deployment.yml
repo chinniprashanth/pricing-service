@@ -24,14 +24,38 @@ spec:
           imagePullPolicy: Always # TODO: Change it to IfNotPresent once CD setup done on cloud
           ports:
             - containerPort: 12789
-            resources:
-              limits:
-                cpu: "2"
-                memory: 4Gi
-              requests:
-                cpu: "1"
-                memory: 2Gi
-
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /auth-service/actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: coc-auth-service
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /auth-service/actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 100
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: "1"
+              memory: 2Gi
           env:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: 'coc-pricing-service'
