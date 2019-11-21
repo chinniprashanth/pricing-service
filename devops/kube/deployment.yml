@@ -24,6 +24,14 @@ spec:
           imagePullPolicy: Always # TODO: Change it to IfNotPresent once CD setup done on cloud
           ports:
             - containerPort: 12789
+            resources:
+              limits:
+                cpu: "2"
+                memory: 4Gi
+              requests:
+                cpu: "1"
+                memory: 2Gi
+
           env:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: 'coc-pricing-service'
