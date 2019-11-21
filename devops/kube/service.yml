@@ -13,6 +13,6 @@ spec:
       targetPort: 12789
   selector:
     app: coc-pricing-service
-  type: LoadBalancer # TODO: Change it to NodePort on cloud
+  type: NodePort # TODO: Change it to NodePort on cloud
   sessionAffinity: None
   externalTrafficPolicy: Cluster   
