@@ -49,13 +49,6 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          resources:
-            limits:
-              cpu: "2"
-              memory: 4Gi
-            requests:
-              cpu: "1"
-              memory: 2Gi
           env:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: 'coc-pricing-service'
