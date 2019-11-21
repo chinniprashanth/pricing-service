@@ -27,23 +27,23 @@ spec:
           livenessProbe:
             failureThreshold: 5
             httpGet:
-              path: /auth-service/actuator/health
-              port: 8080
+              path: /actuator/health
+              port: 12789
               scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          name: coc-auth-service
+          name: coc-pricing-service
           ports:
-          - containerPort: 8080
+          - containerPort: 12789
             name: http
             protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /auth-service/actuator/health
-              port: 8080
+              path: /actuator/health
+              port: 12789
               scheme: HTTP
             initialDelaySeconds: 100
             periodSeconds: 5
