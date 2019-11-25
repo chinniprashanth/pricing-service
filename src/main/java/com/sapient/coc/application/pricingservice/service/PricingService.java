@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 
 /**
@@ -40,7 +41,7 @@ public interface PricingService {
 
 	List<OrderItem> fetchProductDetails(String skuId);
 
-	OrderResponse calculateShipping(String authorization);
+	OrderPriceResp calculateShipping(String authorization);
 
 	// Map<String, List<PromotionFact>>
 	// applyCategoryAndItemPromotionForGivenItems(String skuIds, Integer buyQty);
