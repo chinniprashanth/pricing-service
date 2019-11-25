@@ -24,12 +24,12 @@ public class Sku {
 
     private List<Images> images;
 
-    private List<Attributes> attributes;
+	// private List<Attributes> attributes;
 
     private boolean active;
 
-    @JsonProperty("reviewsAndRatings")
-    private Reviewsandratings reviewsandratings;
+	// @JsonProperty("reviewsAndRatings")
+	// private Reviewsandratings reviewsandratings;
 
     @JsonProperty("salePrice")
     private int saleprice;
@@ -46,8 +46,9 @@ public class Sku {
     @JsonProperty("productPromotionDescription")
     private String productpromotiondescription;
 
-    @JsonProperty("inventory-service")
-    private List<SkuInventory> inventory;
+	/*
+	 * @JsonProperty("inventory-service") private List<SkuInventory> inventory;
+	 */
 
     @JsonProperty("inventoryAvailability")
     private int inventoryavailability;
@@ -112,13 +113,7 @@ public class Sku {
         this.images = images;
     }
 
-    public List<Attributes> getAttributes() {
-        return attributes;
-    }
 
-    public void setAttributes(List<Attributes> attributes) {
-        this.attributes = attributes;
-    }
 
     public boolean getActive() {
         return active;
@@ -128,13 +123,7 @@ public class Sku {
         this.active = active;
     }
 
-    public Reviewsandratings getReviewsandratings() {
-        return reviewsandratings;
-    }
 
-    public void setReviewsandratings(Reviewsandratings reviewsandratings) {
-        this.reviewsandratings = reviewsandratings;
-    }
 
     public int getSaleprice() {
         return saleprice;
@@ -160,13 +149,6 @@ public class Sku {
         this.itempromotiondescription = itempromotiondescription;
     }
 
-    public List<SkuInventory> getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(final List<SkuInventory> inventory) {
-        this.inventory = inventory;
-    }
 
     public String getCategorypromotiondescription() {
         return categorypromotiondescription;
