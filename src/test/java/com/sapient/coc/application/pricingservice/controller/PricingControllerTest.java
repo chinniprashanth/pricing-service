@@ -92,7 +92,6 @@ public class PricingControllerTest {
 
 	@Test
 	public void testApplyItemPromotionForGivenItems() throws Exception {
-
 		requestParams = new JSONObject();
 		requestParams.put("cartId", "100");
 		when(pricingService.fetchCartDetails(token, "100")).thenReturn(cartResposne);
@@ -107,8 +106,6 @@ public class PricingControllerTest {
 
 		requestParams = new JSONObject();
 		requestParams.put("cartId", null);
-		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
-		when(pricingService.applyPromotions(token, null)).thenReturn(null);
 		this.mvc.perform(get("/pricing/items/null")).andExpect(status().isBadRequest());
 	}
 
@@ -117,9 +114,14 @@ public class PricingControllerTest {
 
 		requestParams = new JSONObject();
 		requestParams.put("cartId", "");
-		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
-		when(pricingService.applyPromotions(token, null)).thenReturn(null);
 		this.mvc.perform(get("/pricing/items/")).andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	public void testApplyShippingPricing() throws Exception {
+
+		this.mvc.perform(get("/pricing/order").contentType(MediaType.APPLICATION_JSON).header("Authorization", token)
+				.content(requestParams.toString())).andExpect(status().is2xxSuccessful());
 	}
 
 }
