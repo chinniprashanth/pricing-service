@@ -12,7 +12,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-@FeignClient(name = "fulfillment-service", url = "http://23.251.147.154:12787", fallback = FulfillmentServiceFalBack.class, configuration = FeignConfigurationPricing.class)
+@FeignClient(name = "fulfillment-service", url = "http://localhost:12787", fallback = FulfillmentServiceFalBack.class, configuration = FeignConfigurationPricing.class)
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
