@@ -33,13 +33,12 @@ spring:
     readTimeout: 2
     connectTimeout: 2
   kafka:
-    groupId: coregrp
-    consumerFactory: kafkaListenerContainerFactory
-    email:
-      consumerFactory: emailConsumerFactory
-      topic:
-        name: emailTopic
+    groupId: pricinggrp
+    consumerFactory: pricingConsumerFactory
     bootstrapAddress: localhost:9092
+    message:
+      topic:
+        name: pricingTopic
     batch:
       size: 16384
     acks: all
