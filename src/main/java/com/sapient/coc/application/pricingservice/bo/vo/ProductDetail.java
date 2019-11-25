@@ -6,22 +6,22 @@ package com.sapient.coc.application.pricingservice.bo.vo;
  */
 public class ProductDetail {
 
-    private String id;
-    private Product product;
+	private String id;
+	private Product product;
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public Product getProduct() {
-        return product;
-    }
+	public Product getProduct() {
+		return product;
+	}
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+	public void setProduct(Product product) {
+		this.product = product;
+	}
 }
