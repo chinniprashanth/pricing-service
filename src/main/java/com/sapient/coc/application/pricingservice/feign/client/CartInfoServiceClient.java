@@ -17,7 +17,7 @@ import feign.RequestLine;
  * 
  * @author pooyadav
  */
-@FeignClient(name = "cartservice", url = "http://35.184.76.237:12786/", fallback = CartInfoServiceFallBack.class, configuration = FeignConfigurationPricing.class)
+@FeignClient(name = "cartservice", url = "http://35.241.4.242/", fallback = CartInfoServiceFallBack.class, configuration = FeignConfigurationPricing.class)
 @RibbonClient(name = "cartservice")
 public interface CartInfoServiceClient {
 
@@ -27,7 +27,7 @@ public interface CartInfoServiceClient {
 	 * @param query
 	 * @return
 	 */
-	@RequestLine("GET v1/cart/{cartId}")
+	@RequestLine("GET v1/cart/{cartId}/")
 	@Headers({ "Authorization:{token}", "Accept: application/json" })
 	CartResp getOrderDetails(@Param("token") String token, @Param("cartId") String cartId);
 }

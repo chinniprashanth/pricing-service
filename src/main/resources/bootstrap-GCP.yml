@@ -56,10 +56,10 @@ logging:
 application:
   order:
     client:
-      url: http://34.67.147.21:12784
+      url: http://35.241.4.242/
   inventory:
     client:
-      url: http://34.66.137.98:12787
+      url: http://35.241.4.242/
   product:
     client:
       url: https://dev.rapidcommerce.io/api/productdetail

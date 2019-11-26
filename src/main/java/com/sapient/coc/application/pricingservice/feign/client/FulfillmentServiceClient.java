@@ -12,11 +12,11 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-@FeignClient(name = "fulfillment-service", url = "http://23.251.147.154:12787", fallback = FulfillmentServiceFalBack.class, configuration = FeignConfigurationPricing.class)
+@FeignClient(name = "fulfillment-service", url = "http://35.241.4.242/", fallback = FulfillmentServiceFalBack.class, configuration = FeignConfigurationPricing.class)
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
-	@RequestLine("GET v1/fulfillment/methods")
+	@RequestLine("GET v1/fulfillment/methods/")
 	@Headers({ "Authorization:{token}", "Accept: application/json" })
 	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token);
 
