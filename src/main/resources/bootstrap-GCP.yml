@@ -60,6 +60,7 @@ logging:
                 clients:
                   ProductDetailsClient: debug
                   InventoryClient: debug
+debug: true
 application:
   order:
     client:
