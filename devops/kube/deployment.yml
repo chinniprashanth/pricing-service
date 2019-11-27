@@ -49,6 +49,7 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
+          resources: {}
           env:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: 'coc-pricing-service'
