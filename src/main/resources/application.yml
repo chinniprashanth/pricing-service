@@ -3,4 +3,71 @@ spring:
     name: coc-pricing-service
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    config:
+      uri: http://35.223.134.168:12777
+  redis:
+    channelName: pricing-queue
+    host: 10.1.1.134
+    port: 6379
+    password:
+    maxTotal: 5
+    readTimeout: 2
+    connectTimeout: 2
+  kafka:
+    bootstrap-servers: 10.1.1.134:9092
+    groupId: pricinggrp
+    consumerFactory: pricingConsumerFactory
+    message:
+      topic:
+        name: pricingTopic
+server:
+  port: 12789
+  
+cassandra:
+  keyspace: CoC_Cart
+  basePackages: com.sapient.coc.application
+swagger:
+  api:
+    title: API documentation for Cart Services
+    description: API documentation for Cart Services
+    url:
+      pattern: /v1/cart
+item:
+  quantity:
+    maximum: 99
+    minimum: 1
+security:
+  basic:
+    enabled: true
+  oauth2:
+    client:
+      client-id: web-client
+      client-secret: web-client-secret
+logging:
+  level:
+    com:
+      sapient:
+        coc:
+          application:
+            cartservice:
+              feign:
+                clients:
+                  ProductDetailsClient: debug
+                  InventoryClient: debug
+application:
+  order:
+    client:
+      url: http://34.67.147.21:12784
+  inventory:
+    client:
+      url: http://34.66.137.98:12787
+  product:
+    client:
+      url: https://dev.rapidcommerce.io/api/productdetail
+
+cartservice:
+  authservice:
+    port: 8080
+    ip: 34.67.111.77
 
