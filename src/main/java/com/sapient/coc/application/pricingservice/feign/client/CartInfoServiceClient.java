@@ -17,7 +17,7 @@ import feign.RequestLine;
  * 
  * @author pooyadav
  */
-@FeignClient(name = "cartservice", url = "http://35.184.76.237:12786/", fallback = CartInfoServiceFallBack.class, configuration = FeignConfigurationPricing.class)
+@FeignClient(name = "cartservice", url = "${application.cart.client.url}", fallback = CartInfoServiceFallBack.class, configuration = FeignConfigurationPricing.class)
 @RibbonClient(name = "cartservice")
 public interface CartInfoServiceClient {
 
