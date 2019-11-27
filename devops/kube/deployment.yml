@@ -85,7 +85,7 @@ spec:
     apiVersion: apps/v1beta1
     kind: Deployment
     name: coc-pricing-service
-  minReplicas: 1 # TODO: Update the no of minReplicas
-  maxReplicas: 1 # TODO: Update the no of maxReplicas
+  minReplicas: 2 # TODO: Update the no of minReplicas
+  maxReplicas: 3 # TODO: Update the no of maxReplicas
   targetCPUUtilizationPercentage: 80
 
