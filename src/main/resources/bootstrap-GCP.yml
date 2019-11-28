@@ -4,6 +4,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   redis:
+    channelName: pricing-queue
     host: 10.1.1.134
     port: 6379
     password:
