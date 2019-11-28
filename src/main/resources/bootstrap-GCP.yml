@@ -50,7 +50,8 @@ spring:
     enabled: true
     trace-id128: true
   
-
+server: 
+  port: 12789
 application:
   cart:
     client:
