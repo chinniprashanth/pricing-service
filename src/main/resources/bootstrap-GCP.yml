@@ -29,6 +29,26 @@ spring:
     message:
       topic:
         name: pricingTopic
+    batch:
+      size: 16384
+    acks: all
+    auto:
+      commit:
+        interval:
+          ms: 10000
+        enable: false
+    retries: 0
+    consumer:
+      timeout:
+        ms: 10000
+    max:
+      poll:
+        records: 1
+  sleuth:
+    sampler:
+      probability: 1
+    enabled: true
+    trace-id128: true
   
 
 application:
