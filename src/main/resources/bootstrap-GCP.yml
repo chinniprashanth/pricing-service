@@ -61,4 +61,37 @@ application:
   product:
     client:
       url: https://dev.rapidcommerce.io/api/productdetail
+feign:
+  maxAttempts: 1
+  custom:
+    max_retry_count: 3
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 50000
+        readTimeout: 50000
+        loggerLevel: full
+zookeeper:
+  sync:
+    time:
+      ms: 2000
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false
+        isolation:
+          thread:
+            timeoutInMilliseconds: 90000
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://35.239.119.88:12761/eureka/
   
