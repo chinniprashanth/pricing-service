@@ -23,7 +23,7 @@ server:
   port: 12789
   
 cassandra:
-  keyspace: CoC_Cart
+  keyspace: CoC_Pricing
   basePackages: com.sapient.coc.application
 swagger:
   api:
