@@ -1,4 +1,9 @@
 debug: true
+cassandra:
+  contactpoints: 10.1.1.132
+  port: 9042
+  keyspace: CoC_pricing
+  basePackages: com.sapient.coc.application
 spring:
   application:
     name: coc-pricing-service
@@ -12,6 +17,18 @@ spring:
     maxTotal: 5
     readTimeout: 2
     connectTimeout: 2
+  kafka:
+    bootstrap-servers: 10.1.1.134:9092
+    groupId: pricinggrp
+    consumerFactory: pricingConsumerFactory
+    email:
+      consumerFactory: emailConsumerFactory
+      topic:
+        name: emailTopic
+    bootstrapAddress: 10.1.1.134:9092
+    message:
+      topic:
+        name: pricingTopic
   
 
 application:
