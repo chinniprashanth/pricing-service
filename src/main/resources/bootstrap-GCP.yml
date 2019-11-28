@@ -1,28 +1,19 @@
+debug: true
 spring:
   application:
     name: coc-pricing-service
   main:
     allow-bean-definition-overriding: true
   redis:
+    channelName: coc-core-channel
     host: 10.1.1.134
     port: 6379
     password:
     maxTotal: 5
     readTimeout: 2
     connectTimeout: 2
-  kafka:
-    bootstrap-servers: 10.1.1.134:9092
-    groupId: pricinggrp
-    consumerFactory: pricingConsumerFactory
-    email:
-      consumerFactory: emailConsumerFactory
-      topic:
-        name: emailTopic
-    bootstrapAddress: 10.1.1.134:9092
-    message:
-      topic:
-        name: pricingTopic
-debug: true
+  
+
 application:
   cart:
     client:
