@@ -1,6 +1,9 @@
 package com.sapient.coc.application.pricingservice.message.config;
 
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +14,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import com.sapient.coc.application.coreframework.message.config.BaseKafkaConsumerConfig;
 import com.sapient.coc.application.coreframework.message.config.KafkaJsonDeserializer;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 
@@ -30,7 +34,7 @@ import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
  */
 @Configuration
 @EnableKafka
-public class PricingEventConfig {
+public class PricingEventConfig extends BaseKafkaConsumerConfig {
 
 	@Value(value = "${spring.kafka.groupId}")
 	private String groupId;
