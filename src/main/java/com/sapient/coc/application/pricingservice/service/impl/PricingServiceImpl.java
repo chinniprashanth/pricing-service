@@ -31,7 +31,6 @@ import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
-import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
 /**
@@ -58,8 +57,9 @@ public class PricingServiceImpl implements PricingService {
 	@Autowired
 	FulfillmentServiceClient fulfillmentServiceClient;
 
-	@Autowired
-	PricingEventPublisher pricingEventPublisher;
+	/*
+	 * @Autowired PricingEventPublisher pricingEventPublisher;
+	 */
 
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
