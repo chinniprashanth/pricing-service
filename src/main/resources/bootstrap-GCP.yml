@@ -94,4 +94,37 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: http://35.239.119.88:12761/eureka/
+
+management:
+  health:
+    mail:
+      enabled: false
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  security:
+    enabled: false
+    user:
+      password: 1234 #the password which apps will use to access its configurations
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,httptrace,metrics,threaddump,mappings,bus-refresh
+swagger:
+  api:
+    title: API documentation Services
+    description: API documentation Services
+    contact: Ashish Abrol
+    licence: Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+    version: 1
+    url:
+      pattern: /v1
+    terms:
+      url: http://www.sapient.com
+  contact: SapientRazorfish
+  licence.url: https://github.com/springfox/springfox/blob/master/LICENSE
+  version: 2.0
+
+
   
