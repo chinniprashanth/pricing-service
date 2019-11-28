@@ -3,4 +3,15 @@ spring:
     name: coc-pricing-service
   main:
     allow-bean-definition-overriding: true
+debug: true
+application:
+  cart:
+    client:
+      url: http://34.67.147.21:12784
+  fulfillment:
+    client:
+      url: http://34.66.137.98:12787
+  product:
+    client:
+      url: https://dev.rapidcommerce.io/api/productdetail
   
