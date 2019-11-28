@@ -181,12 +181,10 @@ public class PricingServiceImpl implements PricingService {
 		orderKafkaResp.setUserId(token);
 		orderResp.setOrderItems(orderItems);
 
-		try {
-			sendMessage(orderKafkaResp);
-		} catch (CoCSystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/*
+		 * try { sendMessage(orderKafkaResp); } catch (CoCSystemException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); }
+		 */
 		return orderResp;
 	}
 
@@ -212,10 +210,11 @@ public class PricingServiceImpl implements PricingService {
 	}
 	
 	public void sendMessage(OrderKafkaResponse cart) throws CoCSystemException {
-
-		logger.debug("Sending message= {}", cart.getActualTotal());
-		pricingEventPublisher.sendMessage(topicName, cart);
-	}
+		/*
+		 * 
+		 * logger.debug("Sending message= {}", cart.getActualTotal());
+		 * pricingEventPublisher.sendMessage(topicName, cart);
+		 */}
 
 
 
