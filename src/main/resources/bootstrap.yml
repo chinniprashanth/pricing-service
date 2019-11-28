@@ -1,6 +1,7 @@
+
 spring:
   application:
-    name: coc-pricing-service
+    name: pricing-service
   profiles:
-    active: GCP
+    active: LOCAL
  

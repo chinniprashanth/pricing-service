@@ -5,30 +5,31 @@ package com.sapient.coc.application.pricingservice.bo.vo;
  *
  */
 public class SkuAttribute {
-	private String name;
-	private String value;
+    private String name;
+    private String value;
 
-	public SkuAttribute() {
-	}
 
-	public SkuAttribute(String name, String value) {
-		this.name = name;
-		this.value = value;
-	}
+    public SkuAttribute() {
+    }
 
-	public String getName() {
-		return name;
-	}
+    public SkuAttribute(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

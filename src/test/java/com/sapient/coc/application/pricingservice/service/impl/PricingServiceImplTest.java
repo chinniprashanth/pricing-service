@@ -90,33 +90,18 @@ public class PricingServiceImplTest {
 		item.setListPrice(20);
 		item.setItemDescription("sadad");
 		item.setItemsTotalPrice(77);
-		item.setQuantity(2);
+		item.setQty(2);
 		item.setSkuId("adasdsad");
 		items.add(item);
 		// result.setItems(items);
 		skuList = new ArrayList<Sku>();
-		Sku itemDetail = new Sku();
-		itemDetail.setSaleprice(20);
-		itemDetail.setListprice(20);
-		itemDetail.setParentproductid("12345");
-		itemDetail.setDescription("Full sleeves shirt");
-		itemDetail.setName("Shirt");
-		skuList.add(itemDetail);
-		List<OrderItem> orderItems = null;
+		Sku sku = new Sku();
+		sku.setId("abc");
+		skuList.add(sku);
+
 		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
 		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(skuList);
-		/*
-		 * skuList.forEach(skuDetail -> { OrderItem orderItem = new OrderItem();
-		 * orderItem.setItemId(skuDetail.getId()); orderItem.setQty(2);
-		 * orderItem.setSalePrice(new Double(skuDetail.getSaleprice()));
-		 * orderItem.setListPrice(new Double(skuDetail.getListprice()));
-		 * orderItem.setSkuId(skuDetail.getId());
-		 * orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
-		 * orderItem.setItemDiscountedPrice(orderItem.getSalePrice() *
-		 * orderItem.getQty()); orderItem.setProductId(skuDetail.getParentproductid());
-		 * orderItem.setItemDescription(skuDetail.getDescription());
-		 * orderItem.setItemName(skuDetail.getName()); orderItems.add(orderItem); });
-		 */
+
 		CartResponse result = pricingService.fetchCartDetails(token, "100");
 		assertNotNull(result);
 	}

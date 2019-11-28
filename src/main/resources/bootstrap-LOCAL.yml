@@ -1,6 +1,7 @@
+
 spring:
   application:
-    name: coc-pricing-service
+    name: pricing-service
   profiles:
     active: LOCAL
   cloud:
@@ -32,12 +33,13 @@ spring:
     readTimeout: 2
     connectTimeout: 2
   kafka:
-    groupId: pricinggrp
-    consumerFactory: pricingConsumerFactory
-    bootstrapAddress: localhost:9092
-    message:
+    groupId: coregrp
+    consumerFactory: kafkaListenerContainerFactory
+    email:
+      consumerFactory: emailConsumerFactory
       topic:
-        name: pricingTopic
+        name: emailTopic
+    bootstrapAddress: localhost:9092
     batch:
       size: 16384
     acks: all
