@@ -10,9 +10,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.sapient.coc.application.coreframework.bo.Money;
+import com.sapient.coc.application.coreframework.exception.CoCSystemException;
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
@@ -20,7 +23,9 @@ import com.sapient.coc.application.pricingservice.bo.vo.Data;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
-import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderItemPrice;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderKafkaResponse;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.ShippingResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
@@ -56,16 +61,18 @@ public class PricingServiceImpl implements PricingService {
 	@Autowired
 	PricingEventPublisher pricingEventPublisher;
 
+	@Value(value = "${spring.kafka.message.topic.name}")
+	private String topicName;
+
 	@Override
 	public CartResponse fetchCartDetails(String token, String cartId) {
 
 		CartResp cartResp = cartInfoServiceClient.getOrderDetails(token, cartId);
-		List<CartItem> cartItems = Arrays.asList(cartResp.getData());
-		// List<CartItem> cartItems = cartResp.getData();
+		List<CartItem> cartItems = Arrays.asList(cartResp.getData()); //
 		List<OrderItem> orderItems = new ArrayList<OrderItem>();
 		List<String> skuIds = new ArrayList<String>();
 		CartResponse cartResponse = new CartResponse();
-		Map<String, Integer> qtySkuId = new HashMap<String,Integer>();
+		Map<String, Integer> qtySkuId = new HashMap<String, Integer>();
 
 		cartItems.forEach(cartItem -> {
 			skuIds.add(cartItem.getSkuId());
@@ -77,33 +84,33 @@ public class PricingServiceImpl implements PricingService {
 		List<Sku> itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(ids);
 		itemDetails.forEach(itemDetail -> {
 			OrderItem orderItem = new OrderItem();
-			orderItem.setItemId(itemDetail.getId());
-			orderItem.setQty(qtySkuId.get(itemDetail.getId()));
+			orderItem.setQuantity(qtySkuId.get(itemDetail.getId()));
 			orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 			orderItem.setListPrice(new Double(itemDetail.getListprice()));
 			orderItem.setSkuId(itemDetail.getId());
-			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
-			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQty());
+			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQuantity());
+			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQuantity());
 			orderItem.setProductId(itemDetail.getParentproductid());
 			orderItem.setItemDescription(itemDetail.getDescription());
-			orderItem.setItemName(itemDetail.getName());
+			orderItem.setName(itemDetail.getName());
 			orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
 			orderItems.add(orderItem);
 		});
 		if (cartResponse.getSubtotal() == 0) {
 			orderItems.forEach(orderItem -> {
 				cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
-				cartResponse.setSubtotal(
-						orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal());
+				cartResponse.setSubtotal(orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal());
 			});
 		}
 		cartResponse.setItems(orderItems);
 		return cartResponse;
+
 	}
 
 	@Override
-	public OrderResponse calculateShipping(String token) {
-		OrderResponse orderResp = new OrderResponse();
+	public OrderPriceResp calculateShipping(String token) {
+		OrderPriceResp orderResp = new OrderPriceResp();
+		OrderKafkaResponse orderKafkaResp = new OrderKafkaResponse();
 		ResponseEntity<Fulfillment> fulfillmentResp =
 		  fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
 		Data fulfillmentData = fulfillmentResp.getBody().getData();
@@ -113,37 +120,73 @@ public class PricingServiceImpl implements PricingService {
 		List<String> skuIds = new ArrayList<String>();
 		itemList.forEach(fulfillmentItem -> {
 			ShippingResponse shipResponse = new ShippingResponse();
-			shipResponse.setShippingCost(fulfillmentItem.getPrice());
+			shipResponse.setShippingCost(new Double(10));
 			shipResponse.setShippingMethod(fulfillmentItem.getFulfillmentMethod());
 			shippingDetailsMap.put(fulfillmentItem.getSkuId(), shipResponse);
 			skuIds.add(fulfillmentItem.getSkuId());
-			priceMap.put(fulfillmentItem.getFulfillmentMethod(), fulfillmentItem.getPrice());
+			priceMap.put(fulfillmentItem.getFulfillmentMethod(), new Double(10));
 		});
 		String ids = skuIds.stream().collect(Collectors.joining(","));
 		List<OrderItem> orderItems = fetchProductDetails(ids);
-		CartResponse cartResponse = new CartResponse();
+		List<OrderItemPrice> orderItemPrice = new ArrayList<OrderItemPrice>();
+
 		double total = 0;
 		for (Map.Entry<String, Double> entry : priceMap.entrySet()) {
 			total = entry.getValue() + total;
 		}
-		cartResponse.setShipping(total);
+		orderResp.setShipping(new Money("USD", total));
+		orderResp.setSubmittedTime(fulfillmentData.getCreatedAt());
+		orderResp.setId(fulfillmentData.getId());
 		orderItems.forEach(orderItem -> {
+			OrderItemPrice itemPrice = new OrderItemPrice();
 			orderItem.setShippingMethod(shippingDetailsMap.get(orderItem.getSkuId()).getShippingMethod());
 			orderItem.setShippingPrice(shippingDetailsMap.get(orderItem.getSkuId()).getShippingCost());
-			if (orderItem.getQty() == 0) {
-				orderItem.setQty(1);
+			if (orderItem.getQuantity() == 0) {
+				orderItem.setQuantity(1);
 			}
-			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQty());
-			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQty());
+			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQuantity());
+			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQuantity());
 
-			cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
-			cartResponse
-					.setSubtotal(orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal()
-					);
+			if (null != orderResp.getActualTotal()) {
+				orderResp.setActualTotal(
+						new Money("USD", (orderItem.getItemsTotalPrice() + orderResp.getActualTotal().getAmount())));
+			} else {
+				orderResp.setActualTotal(new Money("USD", (orderItem.getItemsTotalPrice())));
+			}
+			if (null != orderResp.getSubtotal()) {
+				orderResp.setSubtotal(
+						new Money("USD", orderItem.getItemDiscountedPrice() + orderResp.getSubtotal().getAmount()));
+			} else {
+				orderResp.setSubtotal(new Money("USD", orderItem.getItemDiscountedPrice()));
+			}
+			itemPrice.setItemPrice(new Money("USD", orderItem.getItemPrice()));
+			itemPrice.setItemsTotalPrice(new Money("USD", orderItem.getItemsTotalPrice()));
+			itemPrice.setName(orderItem.getName());
+			itemPrice.setProductId(orderItem.getProductId());
+			itemPrice.setQuantity(orderItem.getQuantity());
+			itemPrice.setShippingMethod(orderItem.getShippingMethod());
+			itemPrice.setShippingPrice(orderItem.getShippingPrice());
+			itemPrice.setSkuId(orderItem.getSkuId());
+			orderItemPrice.add(itemPrice);
+
 		});
-		cartResponse.setSubtotal(cartResponse.getSubtotal() + total);
-		cartResponse.setItems(orderItems);
-		orderResp.setItem(cartResponse);
+		orderResp.setSubtotal(new Money("USD", orderResp.getSubtotal().getAmount() + total));
+		orderKafkaResp.setActualTotal(orderResp.getActualTotal());
+		orderKafkaResp.setId(orderResp.getId());
+		orderKafkaResp.setOrderItems(orderItemPrice);
+		orderKafkaResp.setShipping(orderResp.getShipping());
+		orderKafkaResp.setSubtotal(orderResp.getSubtotal());
+		orderKafkaResp.setTotal(orderResp.getTotal());
+		orderKafkaResp.setTotalDiscount(orderResp.getTotalDiscount());
+		orderKafkaResp.setUserId(token);
+		orderResp.setOrderItems(orderItems);
+
+		try {
+			sendMessage(orderKafkaResp);
+		} catch (CoCSystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return orderResp;
 	}
 
@@ -153,7 +196,6 @@ public class PricingServiceImpl implements PricingService {
 		List<Sku> itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(skuId);
 		itemDetails.forEach(itemDetail -> {
 			OrderItem orderItem = new OrderItem();
-			orderItem.setItemId(itemDetail.getId());
 			orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 			orderItem.setListPrice(new Double(itemDetail.getListprice()));
 			orderItem.setSkuId(itemDetail.getId());
@@ -162,13 +204,18 @@ public class PricingServiceImpl implements PricingService {
 			// orderItem.getQty());
 			orderItem.setProductId(itemDetail.getParentproductid());
 			orderItem.setItemDescription(itemDetail.getDescription());
-			orderItem.setItemName(itemDetail.getName());
+			orderItem.setName(itemDetail.getName());
 			orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
 			orderItems.add(orderItem);
 		});
 		return orderItems;
 	}
 	
+	public void sendMessage(OrderKafkaResponse cart) throws CoCSystemException {
+
+		logger.debug("Sending message= {}", cart.getActualTotal());
+		pricingEventPublisher.sendMessage(topicName, cart);
+	}
 
 
 

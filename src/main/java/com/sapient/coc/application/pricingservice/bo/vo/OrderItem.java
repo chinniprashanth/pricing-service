@@ -11,15 +11,16 @@ public class OrderItem implements Serializable {
 
 	private static final long serialVersionUID = -4703423167816882116L;
 	private String itemId;
-	private String itemName;
+	private String name;
 	private String itemDescription;
 	private String skuId;
 	private String productId;
 	private String imageUrl;
-	private int qty;
+	private int quantity;
 	private double listPrice;
 	private double salePrice;
 	private double itemsTotalPrice;
+	private double itemPrice;
 	private double orderItemTax;
 	private double shippingPrice;
 	private String shippingMethod;
@@ -39,13 +40,6 @@ public class OrderItem implements Serializable {
 		this.itemId = itemId;
 	}
 
-	public String getItemName() {
-		return itemName;
-	}
-
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
 
 	public String getItemDescription() {
 		return itemDescription;
@@ -79,13 +73,7 @@ public class OrderItem implements Serializable {
 		this.imageUrl = imageUrl;
 	}
 
-	public int getQty() {
-		return qty;
-	}
 
-	public void setQty(int qty) {
-		this.qty = qty;
-	}
 
 	public double getListPrice() {
 		DecimalFormat df = new DecimalFormat("###.##");
@@ -186,11 +174,7 @@ public class OrderItem implements Serializable {
 	 * currentprice; }
 	 */
 
-	@Override
-	public String toString() {
-		return itemId + "-" + itemName + "-" + itemDescription + "-" + skuId + "-" + productId + "-" + imageUrl + "-"
-				+ qty + "-" + listPrice + "-" + salePrice;
-	}
+
 
 	public double getShippingPrice() {
 		return shippingPrice;
@@ -206,6 +190,30 @@ public class OrderItem implements Serializable {
 
 	public void setShippingMethod(String shippingMethod) {
 		this.shippingMethod = shippingMethod;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public double getItemPrice() {
+		return itemPrice;
+	}
+
+	public void setItemPrice(double itemPrice) {
+		this.itemPrice = itemPrice;
 	}
 
 }
