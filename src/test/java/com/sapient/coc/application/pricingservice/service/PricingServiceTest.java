@@ -86,7 +86,7 @@ public class PricingServiceTest {
 		item.setListPrice(20);
 		item.setItemDescription("sadad");
 		item.setItemsTotalPrice(77);
-		item.setQty(2);
+		item.setQuantity(2);
 		item.setSkuId("adasdsad");
 		items.add(item);
 		// result.setItems(items);
