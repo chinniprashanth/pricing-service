@@ -54,18 +54,14 @@ logging:
                   ProductDetailsClient: debug
                   InventoryClient: debug
 application:
-  order:
+  cart:
     client:
-      url: http://34.67.147.21:12784
-  inventory:
+      url: http://35.241.4.242
+  fulfillment:
     client:
-      url: http://34.66.137.98:12787
+      url: http://35.241.4.242
   product:
     client:
-      url: https://dev.rapidcommerce.io/api/productdetail
+      url: https://meshstore.rapidcommerce.io/api/productdetail
 
-cartservice:
-  authservice:
-    port: 8080
-    ip: 34.67.111.77
 

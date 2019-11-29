@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableFeignClients
 @SpringBootApplication(scanBasePackages = {"com.sapient.coc.application"}, exclude = {DataSourceAutoConfiguration.class, KafkaAutoConfiguration.class})
-public class PricingServiceApplication{
+public class PricingServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PricingServiceApplication.class, args);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sapient.coc.application.coreframework.controller.BaseController;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
@@ -31,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/pricing")
 @Api(value = "Pricing Service", tags = { "Pricing Service" })
-public class PricingController {
+public class PricingController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PricingController.class);
 
