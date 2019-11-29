@@ -117,8 +117,6 @@ cassandra:
   keyspace: CoC
   basePackages: com.sapient.coc.application
 
-
-
 ---
 spring:
   profiles: docker
