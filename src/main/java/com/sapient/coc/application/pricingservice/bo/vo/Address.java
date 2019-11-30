@@ -18,6 +18,7 @@ public class Address implements Serializable {
 	private String zipCode;
 	private Long profileAddressId;
 
+
 	public String getFirstName() {
 		return firstName;
 	}
