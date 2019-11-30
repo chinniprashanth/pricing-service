@@ -4,11 +4,9 @@ import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.sapient.coc.application.pricingservice.bo.vo.AddressFulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.feign.fallback.FulfillmentServiceFalBack;
 
@@ -20,11 +18,10 @@ import feign.RequestLine;
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
-	@RequestLine("POST /v1/fulfillment/methods/eligible/")
+	@RequestLine("GET /v1/fulfillment/methods/")
 	@Headers({ "Authorization: {token}", "Accept: application/json" })
-	@RequestMapping(value = " /v1/fulfillment/methods/eligible/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token,
-			@RequestBody AddressFulfillment address);
+	@RequestMapping(value = " /v1/fulfillment/methods/", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token);
 
 }
 
