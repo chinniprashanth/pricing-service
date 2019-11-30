@@ -20,9 +20,9 @@ import feign.RequestLine;
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
-	@RequestLine("GET /v1/fulfillment/methods/eligible/")
+	@RequestLine("POST /v1/fulfillment/methods/eligible/")
 	@Headers({ "Authorization: {token}", "Accept: application/json" })
-	@RequestMapping(value = " /v1/fulfillment/methods/eligible/", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = " /v1/fulfillment/methods/eligible/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token,
 			@RequestBody AddressFulfillment address);
 
