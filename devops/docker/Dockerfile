@@ -1,7 +1,7 @@
 #docker-compose.yml to build reviews and ratings docker image
 FROM centos:7.3.1611
 
-#check this
+##check this
 
 MAINTAINER CommerceOnCloud Team
 ENV JAVA_VERSION 8u31
