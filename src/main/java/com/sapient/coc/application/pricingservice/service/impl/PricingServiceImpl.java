@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import com.sapient.coc.application.coreframework.bo.Money;
 import com.sapient.coc.application.coreframework.exception.CoCSystemException;
-import com.sapient.coc.application.pricingservice.bo.vo.AddressFulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
@@ -112,10 +111,8 @@ public class PricingServiceImpl implements PricingService {
 	public OrderPriceResp calculateShipping(String token) {
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = new OrderKafkaResponse();
-		AddressFulfillment address = new AddressFulfillment();
-		address.setZipCode("");
 		ResponseEntity<Fulfillment> fulfillmentResp =
-				fulfillmentServiceClient.getOrderFulFillmentDeatils(token, address);
+				fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
 		Data fulfillmentData = fulfillmentResp.getBody().getData();
 		List<FulfillmentItem> itemList = fulfillmentData.getItems();
 		Map<String, ShippingResponse> shippingDetailsMap = new HashMap<String, ShippingResponse>();
