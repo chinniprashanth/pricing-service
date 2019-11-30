@@ -18,7 +18,7 @@ import feign.RequestLine;
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
-	@RequestLine("POST v1/fulfillment/methods/eligible/")
+	@RequestLine("POST /v1/fulfillment/methods/eligible/")
 	@Headers({ "Authorization:{token}", "Accept: application/json" })
 	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token,
 			@RequestBody AddressFulfillment address);
