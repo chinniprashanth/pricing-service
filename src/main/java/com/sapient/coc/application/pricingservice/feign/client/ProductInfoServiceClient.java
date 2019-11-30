@@ -23,7 +23,7 @@ import feign.RequestLine;
  */
 @FeignClient(name = "productDetail", configuration = FeignConfigurationPricing.class,
 //, fallback = ProductInfoFallBack.class 
-		url = "https://dev.rapidcommerce.io/api/productdetail")
+		url = "https://meshstore.rapidcommerce.io/api/productdetail")
 @RibbonClient(name="product-detail")
 public interface ProductInfoServiceClient {
 

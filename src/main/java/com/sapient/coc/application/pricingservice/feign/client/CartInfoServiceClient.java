@@ -4,7 +4,6 @@ import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
-import com.sapient.coc.application.pricingservice.feign.FeignConfigurationPricing;
 import com.sapient.coc.application.pricingservice.feign.fallback.CartInfoServiceFallBack;
 
 import feign.Headers;
@@ -17,7 +16,7 @@ import feign.RequestLine;
  * 
  * @author pooyadav
  */
-@FeignClient(name = "cartservice", url = "http://35.241.4.242/", fallback = CartInfoServiceFallBack.class, configuration = FeignConfigurationPricing.class)
+@FeignClient(name = "cartservice", url = "http://35.241.4.242/", fallback = CartInfoServiceFallBack.class)
 @RibbonClient(name = "cartservice")
 public interface CartInfoServiceClient {
 
