@@ -12,7 +12,8 @@ import java.io.Serializable;
  *******************************************************/
 public class AddressFulfillment implements Serializable {
 
-	private static final long serialVersionUID = 1570287277576985767L;
+
+	private static final long serialVersionUID = 2706249629603028485L;
 
 	private String country;
 
