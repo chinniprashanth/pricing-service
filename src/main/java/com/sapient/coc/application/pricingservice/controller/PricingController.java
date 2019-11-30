@@ -59,14 +59,12 @@ public class PricingController {
 		return new ResponseEntity<>(price, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/order", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/order", method = RequestMethod.POST, produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Applied given promotion for given items", response = ResponseEntity.class),
 			@ApiResponse(code = 400, message = "Bad Request | order not found") })
-	@ApiOperation(value = "${applyShippingPricing.ApiOperation.value}", notes = "${applyShippingPricing.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
+	@ApiOperation(value = "${applyShippingPricing.ApiOperation.value}", notes = "${applyShippingPricing.ApiOperation.notes}", httpMethod = "POST", produces = "application/json", responseContainer = "Map", tags = {
 			"Pricing Service" })
-	@ApiImplicitParams({
-			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
 	public ResponseEntity<OrderPriceResp> applyShippingPricing(@RequestHeader("Authorization") String authorization) {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
 		OrderPriceResp price = pricingService.calculateShipping(authorization);
