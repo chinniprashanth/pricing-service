@@ -26,7 +26,7 @@ public interface CartInfoServiceClient {
 	 * @param query
 	 * @return
 	 */
-	@RequestLine("GET v1/cart/{cartId}")
+	@RequestLine("GET v1/cart/{cartId}/")
 	@Headers({ "Authorization:{token}", "Accept: application/json" })
 	CartResp getOrderDetails(@Param("token") String token, @Param("cartId") String cartId);
 }
