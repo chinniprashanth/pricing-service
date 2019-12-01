@@ -17,6 +17,9 @@ public class FulfillmentItem {
 	@JsonProperty("price")
 	private Double price;
 
+	@JsonProperty("quantity")
+	private Integer quantity;
+
 	public String getSkuId() {
 		return skuId;
 	}
@@ -41,5 +44,12 @@ public class FulfillmentItem {
 		this.price = price;
 	}
 
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
 
 }
