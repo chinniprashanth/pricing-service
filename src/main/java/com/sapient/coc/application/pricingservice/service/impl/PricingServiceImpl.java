@@ -190,16 +190,6 @@ public class PricingServiceImpl implements PricingService {
 			itemPrice = new OrderItemPrice(orderItem.getName(), orderItem.getProductId(), orderItem.getSkuId(),
 					orderItem.getShippingMethod(), orderItem.getShippingPrice(), orderItem.getQuantity(),
 					new Money("USD", orderItem.getItemPrice()), new Money("USD", orderItem.getItemsTotalPrice()));
-			/*
-			 * itemPrice.setItemPrice(new Money("USD", orderItem.getItemPrice()));
-			 * itemPrice.setItemsTotalPrice(new Money("USD",
-			 * orderItem.getItemsTotalPrice())); itemPrice.setName(orderItem.getName());
-			 * itemPrice.setProductId(orderItem.getProductId());
-			 * itemPrice.setQuantity(orderItem.getQuantity());
-			 * itemPrice.setShippingMethod(orderItem.getShippingMethod());
-			 * itemPrice.setShippingPrice(orderItem.getShippingPrice());
-			 * itemPrice.setSkuId(orderItem.getSkuId());
-			 */
 			orderItemPrice.add(itemPrice);
 
 		});
@@ -207,16 +197,7 @@ public class PricingServiceImpl implements PricingService {
 		orderKafkaResp = new OrderKafkaResponse("P", token, orderItemPrice, new Date(), new Date(),
 				orderResp.getSubtotal(), orderResp.getTotal(), orderResp.getActualTotal(), orderResp.getShipping(),
 				orderResp.getTotalDiscount(), new Money("USD", 0.0), orderResp.getId());
-		/*
-		 * orderKafkaResp.setActualTotal(orderResp.getActualTotal());
-		 * orderKafkaResp.setId(orderResp.getId());
-		 * orderKafkaResp.setOrderItems(orderItemPrice);
-		 * orderKafkaResp.setShipping(orderResp.getShipping());
-		 * orderKafkaResp.setSubtotal(orderResp.getSubtotal());
-		 * orderKafkaResp.setTotal(orderResp.getTotal());
-		 * orderKafkaResp.setTotalDiscount(orderResp.getTotalDiscount());
-		 * orderKafkaResp.setUserId(token); orderResp.setOrderItems(orderItems);
-		 */
+		orderResp.setOrderItems(orderItems);
 		try {
 			sendMessage(orderKafkaResp);
 		} catch (CoCSystemException e) {
