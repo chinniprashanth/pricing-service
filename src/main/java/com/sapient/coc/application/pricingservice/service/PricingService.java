@@ -5,6 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
+import com.sapient.coc.application.coreframework.exception.CoCSystemException;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
@@ -20,7 +22,7 @@ public interface PricingService {
 	
 	public static final Logger logger = LoggerFactory.getLogger(PricingService.class);
 
-	default OrderResponse applyPromotions(String token, String cartId) {
+	default OrderResponse applyPromotions(String token, String cartId) throws CoCBusinessException, CoCSystemException {
 		
 		CartResponse cartResponse = fetchCartDetails(token, cartId);
 		OrderResponse orderResponse = new OrderResponse();
@@ -37,11 +39,11 @@ public interface PricingService {
 	// Map<String, List<PromotionFact>> applyItemPromotionForGivenItems(List<String>
 	// skuIds, Integer buyQty);
 	
-	CartResponse fetchCartDetails(String token, String cartId);
+	CartResponse fetchCartDetails(String token, String cartId) throws CoCBusinessException, CoCSystemException;
 
-	List<OrderItem> fetchProductDetails(String skuId);
+	List<OrderItem> fetchProductDetails(String skuId) throws CoCBusinessException, CoCSystemException;
 
-	OrderPriceResp calculateShipping(String authorization);
+	OrderPriceResp calculateShipping(String authorization) throws CoCBusinessException, CoCSystemException;
 
 	// Map<String, List<PromotionFact>>
 	// applyCategoryAndItemPromotionForGivenItems(String skuIds, Integer buyQty);

@@ -9,6 +9,24 @@ import com.sapient.coc.application.coreframework.bo.Money;
 
 public class OrderKafkaResponse implements Serializable {
 
+	public OrderKafkaResponse(String orderStatus, String userId, List<OrderItemPrice> orderItems, Date submittedTime,
+			Date deliveryTime, Money subtotal, Money total, Money actualTotal, Money shipping, Money totalDiscount,
+			Money tax, String id) {
+		super();
+		this.orderStatus = orderStatus;
+		this.userId = userId;
+		this.orderItems = orderItems;
+		this.submittedTime = submittedTime;
+		this.deliveryTime = deliveryTime;
+		this.subtotal = subtotal;
+		this.total = total;
+		this.actualTotal = actualTotal;
+		this.shipping = shipping;
+		this.totalDiscount = totalDiscount;
+		this.tax = tax;
+		this.id = id;
+	}
+
 	private static final long serialVersionUID = -3784122413505368842L;
 
 	private String orderStatus;

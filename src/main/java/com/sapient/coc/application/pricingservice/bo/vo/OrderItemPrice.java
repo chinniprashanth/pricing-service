@@ -7,6 +7,19 @@ import com.sapient.coc.application.coreframework.bo.Money;
 public class OrderItemPrice implements Serializable {
 
 
+	public OrderItemPrice(String name, String productId, String skuId, String shippingMethod, double shippingPrice,
+			int quantity, Money itemsTotalPrice, Money itemPrice) {
+		super();
+		this.name = name;
+		this.productId = productId;
+		this.skuId = skuId;
+		this.shippingMethod = shippingMethod;
+		this.shippingPrice = shippingPrice;
+		this.quantity = quantity;
+		this.itemsTotalPrice = itemsTotalPrice;
+		this.itemPrice = itemPrice;
+	}
+
 	private static final long serialVersionUID = 1325423252873814603L;
 
 	private String name;
