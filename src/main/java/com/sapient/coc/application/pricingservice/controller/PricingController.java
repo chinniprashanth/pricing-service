@@ -1,5 +1,7 @@
 package com.sapient.coc.application.pricingservice.controller;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
+import com.sapient.coc.application.coreframework.exception.CoCSystemException;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 import com.sapient.coc.application.pricingservice.service.PricingService;
@@ -35,6 +39,7 @@ import io.swagger.annotations.ApiResponses;
 public class PricingController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PricingController.class);
+	private static final String CANT_FETCH_PRICING = "Can't fetch pricing details";
 
 	@Autowired
 	private PricingService pricingService;
@@ -50,13 +55,14 @@ public class PricingController {
 			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
 	public ResponseEntity<OrderResponse> applyItemPricing(
 			@RequestHeader("Authorization") String authorization,
-			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId) {
+			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId)
+			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
-		if (cartId == null || cartId.isEmpty())
+		if (null == cartId || cartId.isEmpty())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		OrderResponse price = pricingService.applyPromotions(authorization, cartId);
-		logger.info("End the applyItemPricing method in PricingController {}", 0);
-		return new ResponseEntity<>(price, HttpStatus.OK);
+		return Optional.ofNullable(pricingService.applyPromotions(authorization, cartId))
+				.map(result -> ResponseEntity.ok().body(result))
+				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}
 
 	@RequestMapping(value = "/order", method = RequestMethod.GET, produces = "application/json")
@@ -65,7 +71,8 @@ public class PricingController {
 			@ApiResponse(code = 400, message = "Bad Request | order not found") })
 	@ApiOperation(value = "${applyShippingPricing.ApiOperation.value}", notes = "${applyShippingPricing.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
 			"Pricing Service" })
-	public ResponseEntity<OrderPriceResp> applyShippingPricing(@RequestHeader("Authorization") String authorization) {
+	public ResponseEntity<OrderPriceResp> applyShippingPricing(@RequestHeader("Authorization") String authorization)
+			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
 		OrderPriceResp price = pricingService.calculateShipping(authorization);
 		logger.info("End the applyItemPricing method in PricingController {}", 0);
