@@ -174,7 +174,6 @@ public class PricingServiceImpl implements PricingService {
 			orderItem.setQuantity(skuQuantityMap.get(orderItem.getSkuId()));
 			orderItem.setItemsTotalPrice(orderItem.getListPrice() * orderItem.getQuantity());
 			orderItem.setItemDiscountedPrice(orderItem.getSalePrice() * orderItem.getQuantity());
-
 			if (null != orderResp.getActualTotal()) {
 				orderResp.setActualTotal(
 						new Money("USD", (orderItem.getItemsTotalPrice() + orderResp.getActualTotal().getAmount())));
@@ -194,7 +193,7 @@ public class PricingServiceImpl implements PricingService {
 
 		});
 		orderResp.setSubtotal(new Money("USD", orderResp.getSubtotal().getAmount() + total));
-		orderKafkaResp = new OrderKafkaResponse("P", token, orderItemPrice, new Date(), new Date(),
+		orderKafkaResp = new OrderKafkaResponse("P", token, orderItemPrice, fulfillmentData.getCreatedAt(), new Date(),
 				orderResp.getSubtotal(), orderResp.getTotal(), orderResp.getActualTotal(), orderResp.getShipping(),
 				orderResp.getTotalDiscount(), new Money("USD", 0.0), orderResp.getId());
 		orderResp.setOrderItems(orderItems);
@@ -220,6 +219,7 @@ public class PricingServiceImpl implements PricingService {
 			orderItem.setItemDescription(itemDetail.getDescription());
 			orderItem.setName(itemDetail.getName());
 			orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
+			orderItem.setItemId(itemDetail.getId());
 			orderItems.add(orderItem);
 		});
 		return orderItems;
@@ -227,7 +227,7 @@ public class PricingServiceImpl implements PricingService {
 	
 	public void sendMessage(OrderKafkaResponse cart) throws CoCSystemException {
 
-		logger.debug("Sending message= {}", cart.getActualTotal());
+		logger.debug("Sending order pricing message= {}", cart.getActualTotal());
 		pricingEventPublisher.sendMessage(topicName, cart);
 	}
 
