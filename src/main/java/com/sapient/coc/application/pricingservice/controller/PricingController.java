@@ -74,9 +74,14 @@ public class PricingController {
 	public ResponseEntity<OrderPriceResp> applyShippingPricing(@RequestHeader("Authorization") String authorization)
 			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
-		OrderPriceResp price = pricingService.calculateShipping(authorization);
-		logger.info("End the applyItemPricing method in PricingController {}", 0);
-		return new ResponseEntity<>(price, HttpStatus.OK);
+		/*
+		 * OrderPriceResp price = pricingService.calculateShipping(authorization);
+		 * logger.info("End the applyItemPricing method in PricingController {}", 0);
+		 * return new ResponseEntity<>(price, HttpStatus.OK);
+		 */
+		return Optional.ofNullable(pricingService.calculateShipping(authorization))
+				.map(result -> ResponseEntity.ok().body(result))
+				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}
 
 }
