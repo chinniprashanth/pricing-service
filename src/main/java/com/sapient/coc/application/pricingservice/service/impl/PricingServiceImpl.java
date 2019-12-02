@@ -159,7 +159,7 @@ public class PricingServiceImpl implements PricingService {
 			shipResponse.setShippingMethod(fulfillmentItem.getFulfillmentMethod());
 			shippingDetailsMap.put(fulfillmentItem.getSkuId(), shipResponse);
 			skuIds.add(fulfillmentItem.getSkuId());
-			priceMap.put(fulfillmentItem.getFulfillmentMethod(), fulfillmentItem.getPrice());
+				priceMap.put(fulfillmentItem.getSkuId(), fulfillmentItem.getPrice());
 			skuQuantityMap.put(fulfillmentItem.getSkuId(), fulfillmentItem.getQuantity());
 
 		});
@@ -169,8 +169,8 @@ public class PricingServiceImpl implements PricingService {
 		List<OrderItemPrice> orderItemPrice = new ArrayList<OrderItemPrice>();
 
 		double total = 0;
-		for (Map.Entry<String, Double> entry : priceMap.entrySet()) {
-			total = entry.getValue() + total;
+		for (Double entry : priceMap.values()) {
+			total = entry + total;
 		}
 		orderResp.setShipping(new Money("USD", total));
 		orderResp.setSubmittedTime(fulfillmentData.getCreatedAt());
