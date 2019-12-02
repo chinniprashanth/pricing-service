@@ -159,7 +159,7 @@ public class PricingServiceImpl implements PricingService {
 			shipResponse.setShippingMethod(fulfillmentItem.getFulfillmentMethod());
 			shippingDetailsMap.put(fulfillmentItem.getSkuId(), shipResponse);
 			skuIds.add(fulfillmentItem.getSkuId());
-			priceMap.put(fulfillmentItem.getFulfillmentMethod(), fulfillmentItem.getPrice());
+				priceMap.put(fulfillmentItem.getSkuId(), fulfillmentItem.getPrice());
 			skuQuantityMap.put(fulfillmentItem.getSkuId(), fulfillmentItem.getQuantity());
 
 		});
