@@ -139,7 +139,14 @@ public class PricingServiceImpl implements PricingService {
 	public OrderPriceResp calculateShipping(String token) throws CoCBusinessException, CoCSystemException {
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
-		ResponseEntity<Fulfillment> fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
+		ResponseEntity<Fulfillment> fulfillmentResp;
+		try {
+			fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
+		} catch (Exception exc) {
+			logger.error(ERROR_FULFILLMENT_MISSING);
+			throw new CoCSystemException(ERROR_FULFILLMENT_MISSING);
+		}
+		if (null != fulfillmentResp.getBody() && null != fulfillmentResp.getBody().getData()) {
 		Data fulfillmentData = fulfillmentResp.getBody().getData();
 		List<FulfillmentItem> itemList = fulfillmentData.getItems();
 		Map<String, ShippingResponse> shippingDetailsMap = new HashMap<String, ShippingResponse>();
@@ -158,6 +165,7 @@ public class PricingServiceImpl implements PricingService {
 		});
 		String ids = skuIds.stream().collect(Collectors.joining(","));
 		List<OrderItem> orderItems = fetchProductDetails(ids);
+			if (null != orderItems && orderItems.size() >= 1) {
 		List<OrderItemPrice> orderItemPrice = new ArrayList<OrderItemPrice>();
 
 		double total = 0;
@@ -202,6 +210,14 @@ public class PricingServiceImpl implements PricingService {
 		} catch (CoCSystemException e) {
 			logger.error("Error publishing Kafka messgae");
 			throw new CoCSystemException("Error publishing Kafka messgae");
+			}
+			} else {
+				logger.error(ERROR_PRODUCT_DETAIL_MISSING);
+				throw new CoCSystemException(ERROR_PRODUCT_DETAIL_MISSING);
+			}
+		} else {
+			logger.error(ERROR_FULFILLMENT_MISSING);
+			throw new CoCSystemException(ERROR_FULFILLMENT_MISSING);
 		}
 		return orderResp;
 	}
