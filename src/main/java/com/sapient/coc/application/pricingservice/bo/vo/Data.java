@@ -6,6 +6,12 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty ;
 
 
+/**
+ * To Fetch fulfillment details
+ * 
+ * @author pooyadav
+ *
+ */
 public class Data {
 
 	private String id;

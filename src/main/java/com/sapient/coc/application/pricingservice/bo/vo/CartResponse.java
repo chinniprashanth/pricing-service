@@ -5,6 +5,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Response from pricing service for cart details
+ * 
+ * @author pooyadav
+ *
+ */
 public class CartResponse implements Serializable {
 
 	private static final long serialVersionUID = 2335688676823292750L;

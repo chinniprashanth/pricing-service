@@ -2,6 +2,12 @@ package com.sapient.coc.application.pricingservice.bo.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * To fetch fulfillment details
+ * 
+ * @author pooyadav
+ *
+ */
 public class FulfillmentItem {
 
 

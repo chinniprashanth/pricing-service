@@ -62,6 +62,6 @@ application:
       url: http://35.241.4.242
   product:
     client:
-      url: https://meshstore.rapidcommerce.io/api/productdetail
+      url: https://dev.rapidcommerce.io/api/productdetail
 
 

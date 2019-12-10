@@ -22,7 +22,8 @@ import com.sapient.coc.application.pricingservice.bo.vo.OrderKafkaResponse;
  *******************************************************/
 
 /**
- * Implements the sender for messages for asynch flows
+ * Implements the sender for messages for asynch flows, to publish message to
+ * order service
  *
  * @author pooyadav
  */

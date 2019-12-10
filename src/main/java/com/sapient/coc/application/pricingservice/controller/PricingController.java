@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -45,6 +44,14 @@ public class PricingController {
 	private PricingService pricingService;
 
 
+	/**
+	 * @param authorization
+	 * @param cartId
+	 * @return
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException   API to fetch cart item price and dynamic price
+	 *                              as well
+	 */
 	@RequestMapping(value = "/items/{cartId}", method = RequestMethod.GET, produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Applied given promotion for given items", response = ResponseEntity.class),
@@ -58,13 +65,18 @@ public class PricingController {
 			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId)
 			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
-		if (null == cartId || cartId.isEmpty())
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		return Optional.ofNullable(pricingService.applyPromotions(authorization, cartId))
 				.map(result -> ResponseEntity.ok().body(result))
 				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}
 
+
+	/**
+	 * @param authorization
+	 * @return
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException   API to fetch order pricing details
+	 */
 	@RequestMapping(value = "/order", method = RequestMethod.GET, produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Applied given promotion for given items", response = ResponseEntity.class),
@@ -74,14 +86,9 @@ public class PricingController {
 	public ResponseEntity<OrderPriceResp> applyShippingPricing(@RequestHeader("Authorization") String authorization)
 			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyItemPricing method in PricingController for cart id {}", 0);
-		/*
-		 * OrderPriceResp price = pricingService.calculateShipping(authorization);
-		 * logger.info("End the applyItemPricing method in PricingController {}", 0);
-		 * return new ResponseEntity<>(price, HttpStatus.OK);
-		 */
 		return Optional.ofNullable(pricingService.calculateShipping(authorization))
 				.map(result -> ResponseEntity.ok().body(result))
 				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}
-
+	
 }

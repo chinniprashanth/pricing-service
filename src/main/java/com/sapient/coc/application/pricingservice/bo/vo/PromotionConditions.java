@@ -4,7 +4,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/*******************************************************
+ * Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+ *
+ * This file is part of CommerceOnCloud project.
+ *
+ * CommerceOnCloud can not be copied and/or distributed without the express
+ * permission of PublicisSapient
+ *******************************************************/
 /**
+ * POJO to Deserialize the Product Images details
+ * 
  * @author pooyadav
  *
  */

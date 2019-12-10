@@ -3,7 +3,17 @@ package com.sapient.coc.application.pricingservice.bo.vo;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
+/*******************************************************
+ * Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+ *
+ * This file is part of CommerceOnCloud project.
+ *
+ * CommerceOnCloud can not be copied and/or distributed without the express
+ * permission of PublicisSapient
+ *******************************************************/
 /**
+ * POJO to send order item details
+ * 
  * @author pooyadav
  *
  */
@@ -17,20 +27,41 @@ public class OrderItem implements Serializable {
 	private String productId;
 	private String imageUrl;
 	private int quantity;
-	private double listPrice;
-	private double salePrice;
 	private double itemsTotalPrice;
 	private double itemPrice;
 	private double orderItemTax;
 	private double shippingPrice;
 	private String shippingMethod;
-	// private double currentprice;
 	private double itemDiscountedPrice;
 	private double categoryDiscountedPrice;
 	private double productDiscountedPrice;
 	private String itemPromotionDescription;
 	private String categoryPromotionDescription;
 	private String productPromotionDescription;
+	private boolean priceChanged;
+	private double listPrice;
+	private double salePrice;
+	private double wasPrice;
+
+	public OrderItem() {
+		super();
+	}
+
+	public OrderItem(String itemId, String skuId, String productId, int quantity, double listPrice, double salePrice,
+			double itemsTotalPrice, double itemPrice, double itemDiscountedPrice, boolean priceChanged) {
+		super();
+		this.itemId = itemId;
+		this.skuId = skuId;
+		this.productId = productId;
+		this.quantity = quantity;
+		this.listPrice = listPrice;
+		this.salePrice = salePrice;
+		this.itemsTotalPrice = itemsTotalPrice;
+		this.itemPrice = itemPrice;
+		this.itemDiscountedPrice = itemDiscountedPrice;
+		this.priceChanged = priceChanged;
+	}
+
 
 	public String getItemId() {
 		return itemId;
@@ -111,11 +142,7 @@ public class OrderItem implements Serializable {
 		this.orderItemTax = orderItemTax;
 	}
 
-	/*
-	 * public double getTotalTax() { return totalTax; }
-	 * 
-	 * public void setTotalTax(double totalTax) { this.totalTax = totalTax; }
-	 */
+
 	public double getItemDiscountedPrice() {
 		return itemDiscountedPrice;
 	}
@@ -166,16 +193,14 @@ public class OrderItem implements Serializable {
 		this.productPromotionDescription = productPromotionDescription;
 	}
 
+	public double getWasPrice() {
+		return wasPrice;
+	}
+
+	public void setWasPrice(double wasPrice) {
+		this.wasPrice = wasPrice;
+	}
 	
-	/*
-	 * public double getCurrentprice() { return currentprice; }
-	 * 
-	 * public void setCurrentprice(double currentprice) { this.currentprice =
-	 * currentprice; }
-	 */
-
-
-
 	public double getShippingPrice() {
 		return shippingPrice;
 	}
@@ -214,6 +239,14 @@ public class OrderItem implements Serializable {
 
 	public void setItemPrice(double itemPrice) {
 		this.itemPrice = itemPrice;
+	}
+
+	public boolean isPriceChanged() {
+		return priceChanged;
+	}
+
+	public void setPriceChanged(boolean priceChanged) {
+		this.priceChanged = priceChanged;
 	}
 
 }

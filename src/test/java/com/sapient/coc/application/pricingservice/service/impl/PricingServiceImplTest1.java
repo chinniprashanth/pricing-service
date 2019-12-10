@@ -29,14 +29,15 @@ import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
+import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = PricingServiceImpl.class, secure = false)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PricingServiceImplTest {
+public class PricingServiceImplTest1 {
 
-	private static Logger logger = LoggerFactory.getLogger(PricingServiceImplTest.class);
+	private static Logger logger = LoggerFactory.getLogger(PricingServiceImplTest1.class);
 
 	@InjectMocks
 	private PricingService pricingService = new PricingServiceImpl();
@@ -49,6 +50,9 @@ public class PricingServiceImplTest {
 
 	@MockBean
 	private FulfillmentServiceClient fulfillmentServiceClient;
+
+	@MockBean
+	private PricingEventPublisher pricingEventPublisher;
 
 	private CartResponse orderResponse = null;
 
@@ -74,7 +78,40 @@ public class PricingServiceImplTest {
 
 
 	@Test
-	public void testApplyItemPromotionForGivenItems() throws Exception {
+	public void testfetchCartDetails() throws Exception {
+
+		token = "Bearer asKJSSLKajslASasjlAS";
+		cartResp = new CartResp();
+		data = new CartItem[2];
+		CartItem cartItem = new CartItem();
+		cartItem.setSkuId("100");
+		cartItem.setQuantity(2);
+		data[0] = cartItem;
+		data[1] = cartItem;
+		cartResp.setData(data);
+		items = new ArrayList<OrderItem>();
+		OrderItem item = new OrderItem();
+		item.setListPrice(20);
+		item.setItemDescription("sadad");
+		item.setItemsTotalPrice(77);
+		item.setQuantity(2);
+		item.setSkuId("adasdsad");
+		items.add(item);
+		// result.setItems(items);
+		skuList = new ArrayList<Sku>();
+		Sku sku = new Sku();
+		sku.setId("abc");
+		skuList.add(sku);
+
+		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
+		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(skuList);
+
+		CartResponse result = pricingService.fetchCartDetails(token, "100");
+		assertNotNull(result);
+	}
+
+	@Test
+	public void testorderPricing() throws Exception {
 
 		token = "Bearer asKJSSLKajslASasjlAS";
 		cartResp = new CartResp();

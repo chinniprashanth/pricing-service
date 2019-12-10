@@ -12,7 +12,7 @@ package com.sapient.coc.application.pricingservice.bo.vo;
 /**
  * POJO to Deserialize the Product detail
  *
- * @author ashabrol
+ * @author pooyadav
  */
 public class Attributes {
 

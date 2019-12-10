@@ -2,6 +2,10 @@ package com.sapient.coc.application.pricingservice.bo.vo;
 
 import java.io.Serializable;
 
+/**
+ * @author pooyadav
+ *
+ */
 public class Address implements Serializable {
 
 	/**

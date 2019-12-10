@@ -1,7 +1,7 @@
 
 spring:
   application:
-    name: pricing-service
+    name: coc-pricing-service
   profiles:
     active: LOCAL
   cloud:
@@ -113,8 +113,30 @@ zookeeper:
 cassandra:
   contactpoints: localhost
   port: 9042
-  keyspace: CoC
+  keyspace: coc
   basePackages: com.sapient.coc.application
+logging:
+  level:
+    com:
+      sapient:
+        coc:
+          application:
+            pricingservice:
+              feign:
+                clients:
+                  ProductInfoServiceClient: debug
+                  CartInfoServiceClient: debug
+                  FulfillmentServiceClient: debug
+application:
+  cart:
+    client:
+      url: http://35.241.4.242/
+  fulfillment:
+    client:
+      url: http://35.241.4.242/
+  product:
+    client:
+      url: https://dev.rapidcommerce.io/api/productdetail
 
 ---
 spring:
@@ -122,9 +144,6 @@ spring:
   cloud:
     config:
       uri: http://config-service:12777
----
-spring:
-  profiles: default
-  cloud:
-    config:
-      uri: http://localhost:12787
+
+
+      
