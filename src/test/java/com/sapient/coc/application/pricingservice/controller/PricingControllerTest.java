@@ -33,7 +33,6 @@ import com.sapient.coc.application.coreframework.bo.Money;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
-import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
@@ -50,7 +49,6 @@ public class PricingControllerTest {
 
 	private static Logger logger = LoggerFactory.getLogger(PricingControllerTest.class);
 
-	private OrderResponse orderResponse = null;
 	private OrderPriceResp orderPriceResp = null;
 	private CartResponse cartResposne;
 	private static JSONObject requestParams;
@@ -105,7 +103,6 @@ public class PricingControllerTest {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(pricingController).build();
 		// token = obtainAccessToken();
 
-		orderResponse = new OrderResponse();
 		cartResposne = new CartResponse();
 		items = new ArrayList<OrderItem>();
 		OrderItem orderItem = new OrderItem();
@@ -118,7 +115,6 @@ public class PricingControllerTest {
 		cartResposne.setTotal(100);
 		cartResposne.setSubtotal(100);
 		cartResposne.setActualTotal(100);
-		orderResponse.setItem(cartResposne);
 
 		orderPriceResp = new OrderPriceResp();
 		orderPriceResp.setOrderItems(items);
@@ -152,10 +148,10 @@ public class PricingControllerTest {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
 			ObjectMapper objectMapper = new ObjectMapper();
-			when(pricingService.applyCartPricing(token, "100")).thenReturn(orderResponse);
+			when(pricingService.applyCartPricing(token, "100")).thenReturn(cartResposne);
 			this.mockMvc
 					.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
-							.header("Authorization", token).content(objectMapper.writeValueAsString(orderResponse)))
+							.header("Authorization", token).content(objectMapper.writeValueAsString(cartResposne)))
 					.andExpect(status().is2xxSuccessful());
 		} catch (Exception e) {
 			Assert.fail("Get pricing method failed in Controller");
@@ -173,7 +169,7 @@ public class PricingControllerTest {
 			ObjectMapper objectMapper = new ObjectMapper();
 			when(pricingService.applyCartPricing(token, "100")).thenReturn(null);
 			this.mockMvc.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
-					.header("Authorization", token).content(objectMapper.writeValueAsString(orderResponse)));
+					.header("Authorization", token).content(objectMapper.writeValueAsString(cartResposne)));
 		} catch (Exception e) {
 			logger.debug("Test case passed for Null scenario Get pricing");
 			assertTrue(true);
