@@ -13,6 +13,10 @@ public class Fulfillment {
 	private int code;
 	private String status;
 	private Data data;
+	@JsonProperty("traceId")
+	private String traceid;
+	@JsonProperty("spanId")
+	private String spanid;
 
 	public int getCode() {
 		return code;
@@ -38,10 +42,6 @@ public class Fulfillment {
 		this.data = data;
 	}
 	
-	@JsonProperty("traceId")
-	private String traceid;
 
-	@JsonProperty("spanId")
-	private String spanid;
 
 }

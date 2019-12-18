@@ -3,6 +3,8 @@ package com.sapient.coc.application.pricingservice.stepdef;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sapient.coc.application.pricingservice.cukes.SpringIntegrationTest;
 
@@ -15,74 +17,64 @@ import io.restassured.specification.ResponseSpecification;
 
 public class PricingServiceStepDefs extends SpringIntegrationTest implements En {
 
-	private static final String GET_PRICE = "/pricing/items/37131670-06b0-11ea-8937-9b9c92ca95d0";
-	private static final String GET_SHIPPING_PRICE = "/pricing/items/shipping";
+	private static final String GET_CART_PRICE = "/items/a7dab600-f617-11e9-842c-631303ad6c3f";
+	private static final String GET_ORDER_PRICE = "/order";
 	public static RequestSpecification httpRequest;
 	public static ResponseSpecification httpResponse;
 	public static Response response;
-	private static JSONObject requestParams;
-	private static String cartId = "37131670-06b0-11ea-8937-9b9c92ca95d0";
-	private static final String OAUTH_SVC_URL = "http://34.67.111.77:8080/auth-service/oauth/token";
-
+	public static String PRICE_BASE_URI = "http://35.241.4.242/pricing";
+	private static String cartId = "a7dab600-f617-11e9-842c-631303ad6c3f";
+	private static final String OAUTH_SVC_URL = "http://35.241.4.242/auth-service/oauth/token";
+	private static String token;
+	private static Logger logger = LoggerFactory.getLogger(PricingServiceStepDefs.class);
 
 	public PricingServiceStepDefs() {
 
-		RestAssured.baseURI = "http://localhost:12789";
+		RestAssured.baseURI = PRICE_BASE_URI;
 		httpRequest = RestAssured.given();
 
-		String token;
-		String onlyToken;
 		try {
+			JSONObject requestParams = new JSONObject();
 			token = "Bearer " + obtainAccessToken();
-			onlyToken = obtainAccessToken();
+			logger.debug("token is {}", token);
+			// obtainAccessToken();
 			httpRequest.header("Content-Type", "application/json");
 			httpRequest.header("Authorization", token);
-
-			JSONObject requestParams1 = new JSONObject();
-			requestParams1.put("cartId", cartId);
-
-			JSONObject requestParams2 = new JSONObject();
-			requestParams1.put("cartId", cartId);
-
 
 		Given("^user cart is not empty and should contain items in cart$", () -> {
 				if (null != cartId)
 					try {
-						requestParams1.put("cartId", cartId);
-						requestParams1.put("token", onlyToken);
+						requestParams.put("cartId", cartId);
+						requestParams.put("token", token);
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 		});
 
 		When("^user goes to cart page/ views cart$", () -> {
 
-				httpRequest.body(requestParams1.toString()).get(GET_PRICE).andReturn();
+				httpRequest.body(requestParams.toString()).get(GET_CART_PRICE).andReturn();
 		});
 
 		Then("^price should be displayed for each item in cart and the total amount of the cart$", () -> {
-				response = httpRequest.get(GET_PRICE);
+				response = httpRequest.get(GET_CART_PRICE);
 				response.then().assertThat().statusCode(200);
-				Assert.assertTrue(response.time() < 800);
+				Assert.assertTrue(response.time() < 2400);
 		});
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		When("^user clicks on checkout on shipping page", () -> {
 
-			httpRequest.get(GET_SHIPPING_PRICE).andReturn();
+			httpRequest.get(GET_ORDER_PRICE).andReturn();
 		});
 
 		Then("^User should be able to see the applied prices for shipping$", () -> {
-			response = httpRequest.get(GET_PRICE);
+			response = httpRequest.get(GET_ORDER_PRICE);
 			response.then().assertThat().statusCode(200);
-			Assert.assertTrue(response.time() < 800);
+			Assert.assertTrue(response.time() < 2800);
 		});
 	}
 

@@ -23,13 +23,16 @@ public interface PricingService {
 	public static final Logger logger = LoggerFactory.getLogger(PricingService.class);
 
 	/**
+	 * This method calculates total, subtotal
+	 * 
 	 * @param token
 	 * @param cartId
 	 * @return OrderResponse
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	default OrderResponse applyPromotions(String token, String cartId) throws CoCBusinessException, CoCSystemException {
+	default OrderResponse applyCartPricing(String token, String cartId)
+			throws CoCBusinessException, CoCSystemException {
 		
 		CartResponse cartResponse = fetchCartDetails(token, cartId);
 		OrderResponse orderResponse = new OrderResponse();
@@ -41,6 +44,8 @@ public interface PricingService {
 	}
 	
 	/**
+	 * This method fetches cart details
+	 * 
 	 * @param token
 	 * @param cartId
 	 * @return CartResponse
@@ -50,6 +55,8 @@ public interface PricingService {
 	CartResponse fetchCartDetails(String token, String cartId) throws CoCBusinessException, CoCSystemException;
 
 	/**
+	 * This method fetches product details
+	 * 
 	 * @param skuId
 	 * @return List<OrderItem>
 	 * @throws CoCBusinessException
@@ -58,11 +65,13 @@ public interface PricingService {
 	List<OrderItem> fetchProductDetails(String skuId) throws CoCBusinessException, CoCSystemException;
 
 	/**
+	 * This method calculates order pricing along with shipping price
+	 * 
 	 * @param authorization
 	 * @return OrderPriceResp
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	OrderPriceResp calculateShipping(String authorization) throws CoCBusinessException, CoCSystemException;
+	OrderPriceResp calculateOrderPrice(String authorization) throws CoCBusinessException, CoCSystemException;
 	
 }

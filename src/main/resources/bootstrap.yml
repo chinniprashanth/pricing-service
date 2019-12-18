@@ -1,8 +1,4 @@
-
 spring:
   application:
     name: coc-pricing-service
-  profiles:
-    active: LOCAL
-
- 
+  
