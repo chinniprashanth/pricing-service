@@ -23,12 +23,12 @@ import feign.RequestLine;
  */
 @FeignClient(name = "productDetail", configuration = FeignConfigurationPricing.class,
 //, fallback = ProductInfoFallBack.class 
-		url = "https://dev.rapidcommerce.io/api/productdetail")
+		url = "${application.product.client.url}")
 @RibbonClient(name="product-detail")
 public interface ProductInfoServiceClient {
 
 	/**
-	 * This method returns the promotion details for given items
+	 * This method returns the product details for multiple items
 	 * 
 	 * @param query
 	 * @return
@@ -38,7 +38,7 @@ public interface ProductInfoServiceClient {
 	List<Sku> getProductDetailsForSapecificItems(@Param(value = "id") String id);
 	
 	/**
-	 * product detail service item info
+	 * product detail for single item
 	 *
 	 * @param id
 	 * @return
@@ -48,7 +48,7 @@ public interface ProductInfoServiceClient {
 	Sku getItemDetails(@Param(value = "id") String id);
 
 	/**
-	 * This method returns the details for given products
+	 * This method returns response from product API
 	 * 
 	 * @param query
 	 * @return

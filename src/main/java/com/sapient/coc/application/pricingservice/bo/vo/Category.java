@@ -1,7 +1,11 @@
 package com.sapient.coc.application.pricingservice.bo.vo;
 
+
 /**
- * Created by Tridib Chakraborty on 7/3/17.
+ * To fetch product detail
+ * 
+ * @author pooyadav
+ *
  */
 public class Category {
 

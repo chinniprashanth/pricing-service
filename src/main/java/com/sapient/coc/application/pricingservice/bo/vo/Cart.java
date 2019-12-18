@@ -1,11 +1,18 @@
 package com.sapient.coc.application.pricingservice.bo.vo;
 
 
+
 import java.io.Serializable;
 
 import com.sapient.coc.application.coreframework.bo.Money;
 
 
+/**
+ * POJO to fetch cart details
+ * 
+ * @author pooyadav
+ *
+ */
 public class Cart implements Serializable {
 
 	private static final long serialVersionUID = 9088377971804860566L;
@@ -18,8 +25,6 @@ public class Cart implements Serializable {
     private Integer storeId;
     private String status;
     private String inventoryStatus;
-
-
    
     @Override
     public String toString() {

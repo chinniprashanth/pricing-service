@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,8 @@ import com.sapient.coc.application.pricingservice.bo.vo.OrderKafkaResponse;
  *******************************************************/
 
 /**
- * Implements the sender for messages for asynch flows
+ * Implements the sender for messages for asynch flows, to publish message to
+ * order service
  *
  * @author pooyadav
  */
@@ -43,7 +43,7 @@ public class PricingEventPublisher {
 		logger.debug("sending price {} to topic {}", ordResponse.getActualTotal(), topic);
 
 		try {
-			Message<OrderKafkaResponse> message = MessageBuilder.withPayload(ordResponse)
+			MessageBuilder.withPayload(ordResponse)
 					.setHeader(KafkaHeaders.TOPIC, topic).build();
 			kafkaTemplate.send(topic, ordResponse);
 

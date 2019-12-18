@@ -1,5 +1,7 @@
+
 package com.sapient.coc.application.pricingservice.controller;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,40 +9,64 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
-import org.junit.Before;
+import org.codehaus.jettison.json.JSONObject;
+import org.junit.Assert;
 import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sapient.coc.application.coreframework.bo.Money;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
+import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
-import com.sapient.coc.application.pricingservice.service.impl.PricingServiceImpl;
+import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
+import com.sapient.coc.application.pricingservice.service.PricingService;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = PricingController.class, secure = false)
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+
 public class PricingControllerTest {
 
 	private static Logger logger = LoggerFactory.getLogger(PricingControllerTest.class);
 
+	private OrderResponse orderResponse = null;
+	private OrderPriceResp orderPriceResp = null;
+	private CartResponse cartResposne;
+	private static JSONObject requestParams;
+	private List<OrderItem> items;
+	public static Response response;
+	public static RequestSpecification httpRequest;
+	// private List<OrderItem> items;
+
 	@Autowired
+	private MockMvc mockMvc;
+
+	/*
+	 * @Autowired private PricingController pricingController;
+	 */
+
+	@InjectMocks
 	private PricingController pricingController;
 
 	@TestConfiguration
@@ -53,63 +79,115 @@ public class PricingControllerTest {
 
 	}
 
-	@MockBean
-	private PricingServiceImpl pricingService;
+	@Mock
+	private PricingService pricingService;
 
-	@MockBean
+	@Mock
 	private CartInfoServiceClient cartInfoServiceClient;
 
-	@MockBean
+	@Mock
 	private ProductInfoServiceClient productInfoServiceClient;
 
-	@Autowired
-	private MockMvc mvc;
+	@Mock
+	private FulfillmentServiceClient fulfillmentServiceClient;
 
-	private OrderResponse orderResponse = null;
-	private CartResponse cartResposne;
-	private static JSONObject requestParams;
-	private List<OrderItem> items;
-	private static String token;
+	@Mock
+	private PricingEventPublisher pricingEventPublisher;
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
+	@Value(value = "pricingTopic")
+	private String topicName;
+	private static final String OAUTH_SVC_URL = "http://35.241.4.242/auth-service/oauth/token";
+	String token;
 
-	@Before
-	public void setUp() throws Exception {
-		this.mvc = MockMvcBuilders.standaloneSetup(pricingController).build();
-		token = "Bearer zxczxczczxczxczxczxc";
+	@BeforeEach
+	public void setup() throws Exception {
+		MockitoAnnotations.initMocks(this);
+		this.mockMvc = MockMvcBuilders.standaloneSetup(pricingController).build();
+		// token = obtainAccessToken();
 
 		orderResponse = new OrderResponse();
 		cartResposne = new CartResponse();
 		items = new ArrayList<OrderItem>();
 		OrderItem orderItem = new OrderItem();
+		orderItem.setItemId("23232");
+		orderItem.setItemPrice(new Double(20));
+		orderItem.setQuantity(2);
 		items.add(orderItem);
 		cartResposne.setItems(items);
+		cartResposne.setShipping(new Double(10));
+		cartResposne.setTotal(100);
+		cartResposne.setSubtotal(100);
+		cartResposne.setActualTotal(100);
 		orderResponse.setItem(cartResposne);
 
+		orderPriceResp = new OrderPriceResp();
+		orderPriceResp.setOrderItems(items);
+		orderPriceResp.setActualTotal(new Money("USD", new Double(10)));
+
+		String server = "localhost:12789";
+
+		// if (!System.getProperty("spring.profiles.active").equalsIgnoreCase("LOCAL"))
+		// {
+		server = "35.241.4.242";
+		// }
+
+		RestAssured.baseURI = "http://" + server + "/pricing";
+		logger.debug("the server is {}", server);
+		httpRequest = RestAssured.given();
+
+		// Add a header stating the Request body is a JSON
+		try {
+			httpRequest.header("Content-Type", "application/json");
+			token = "Bearer " + obtainAccessToken();
+			httpRequest.header("Authorization", token);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
 	public void testApplyItemPromotionForGivenItems() throws Exception {
 
-		requestParams = new JSONObject();
-		requestParams.put("cartId", "100");
-		when(pricingService.fetchCartDetails(token, "100")).thenReturn(cartResposne);
-		when(pricingService.applyPromotions(token, "100")).thenReturn(orderResponse);
-		this.mvc.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", token).content(requestParams.toString()))
-				.andExpect(status().is2xxSuccessful());
+		try {
+			requestParams = new JSONObject();
+			requestParams.put("cartId", "100");
+			ObjectMapper objectMapper = new ObjectMapper();
+			when(pricingService.applyCartPricing(token, "100")).thenReturn(orderResponse);
+			this.mockMvc
+					.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
+							.header("Authorization", token).content(objectMapper.writeValueAsString(orderResponse)))
+					.andExpect(status().is2xxSuccessful());
+		} catch (Exception e) {
+			Assert.fail("Get pricing method failed in Controller");
+			logger.error("Get pricing method in Controller", e);
+		}
+
+	}
+
+	@Test
+	public void testApplyItemPromotionForGivenItems_error() throws Exception {
+
+		try {
+			requestParams = new JSONObject();
+			requestParams.put("cartId", "100");
+			ObjectMapper objectMapper = new ObjectMapper();
+			when(pricingService.applyCartPricing(token, "100")).thenReturn(null);
+			this.mockMvc.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization", token).content(objectMapper.writeValueAsString(orderResponse)));
+		} catch (Exception e) {
+			logger.debug("Test case passed for Null scenario Get pricing");
+			assertTrue(true);
+		}
+
 	}
 
 	@Test
 	public void testApplyItemPromotionForGivenItems_null() throws Exception {
-
+		String abc = null;
 		requestParams = new JSONObject();
-		requestParams.put("cartId", null);
-		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
-		when(pricingService.applyPromotions(token, null)).thenReturn(null);
-		this.mvc.perform(get("/pricing/items/null")).andExpect(status().isBadRequest());
+		requestParams.put("cartId", abc);
+		when(pricingService.applyCartPricing(token, null)).thenReturn(null);
+		this.mockMvc.perform(get("/pricing/items/abc")).andExpect(status().is5xxServerError());
 	}
 
 	@Test
@@ -118,8 +196,52 @@ public class PricingControllerTest {
 		requestParams = new JSONObject();
 		requestParams.put("cartId", "");
 		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
-		when(pricingService.applyPromotions(token, null)).thenReturn(null);
-		this.mvc.perform(get("/pricing/items/")).andExpect(status().is4xxClientError());
+		when(pricingService.applyCartPricing(token, null)).thenReturn(null);
+		this.mockMvc.perform(get("/pricing/items/")).andExpect(status().is4xxClientError());
 	}
 
+	@Test
+	public void testApplyShippingPricing() throws Exception {
+
+		try {
+			requestParams = new JSONObject();
+			requestParams.put("cartId", "100");
+			ObjectMapper objectMapper = new ObjectMapper();
+			when(pricingService.calculateOrderPrice(token)).thenReturn(orderPriceResp);
+			this.mockMvc
+					.perform(get("/pricing/order").contentType(MediaType.APPLICATION_JSON)
+							.header("Authorization", token).content(objectMapper.writeValueAsString(orderPriceResp)))
+					.andExpect(status().is2xxSuccessful());
+		} catch (Exception e) {
+			Assert.fail("Get pricing method failed in Controller");
+			logger.error("Get pricing method in Controller", e);
+		}
+
+	}
+
+	@Test
+	public void testApplyShippingPricing_error() throws Exception {
+
+		try {
+			requestParams = new JSONObject();
+			requestParams.put("cartId", "100");
+			ObjectMapper objectMapper = new ObjectMapper();
+			when(pricingService.calculateOrderPrice(token)).thenReturn(null);
+			this.mockMvc.perform(get("/pricing/order").contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization", token).content(objectMapper.writeValueAsString(orderPriceResp)));
+		} catch (Exception e) {
+			logger.debug("Test case passed for Null scenario Get order pricing methods");
+			assertTrue(true);
+		}
+
+	}
+
+	private static String obtainAccessToken() throws Exception {
+
+		Response oauthResponse = RestAssured.given().auth().basic("web-client", "web-client-secret")
+				.formParam("grant_type", "client_credentials").when().post(OAUTH_SVC_URL).andReturn();
+
+		String access_token = oauthResponse.getBody().jsonPath().get("access_token");
+		return access_token;
+	}
 }

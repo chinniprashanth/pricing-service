@@ -3,7 +3,9 @@ package com.sapient.coc.application.pricingservice.bo.vo;
 import java.io.Serializable;
 
 /**
- * @author pyad18
+ * POJO to Deserialize cart items
+ * 
+ * @author pooyadav
  *
  */
 public class CartItem implements Serializable {

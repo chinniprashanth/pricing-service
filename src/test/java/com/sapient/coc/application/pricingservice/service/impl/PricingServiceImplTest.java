@@ -1,82 +1,162 @@
 package com.sapient.coc.application.pricingservice.service.impl;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
+import com.sapient.coc.application.coreframework.exception.CoCSystemException;
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
+import com.sapient.coc.application.pricingservice.bo.vo.Data;
+import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
+import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
+import com.sapient.coc.application.pricingservice.bo.vo.Images;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
+import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
+import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = PricingServiceImpl.class, secure = false)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PricingServiceImplTest {
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
-	private static Logger logger = LoggerFactory.getLogger(PricingServiceImplTest.class);
+class PricingServiceImplTest {
 
 	@InjectMocks
 	private PricingService pricingService = new PricingServiceImpl();
 
-	@MockBean
+	@Mock
 	private CartInfoServiceClient cartInfoServiceClients;
 
-	@MockBean
+	@Mock
 	private ProductInfoServiceClient productInfoServiceClients;
 
-	@MockBean
+	@Mock
 	private FulfillmentServiceClient fulfillmentServiceClient;
 
+	@Mock
+	private PricingEventPublisher pricingEventPublisher;
+
+	@MockBean
 	private CartResponse orderResponse = null;
 
 	@MockBean
 	private CartResp cartResp;
 
+	private static CartItem[] data;
+	private static CartResponse result;
 	private List<OrderItem> items;
-	private static String token;
-	private CartItem data[];
 	private List<Sku> skuList;
+	private static String token;
+	private List<FulfillmentItem> fulfillmentItems;
+	private static Data fulfillmentData;
+	private static final String OAUTH_SVC_URL = "http://35.241.4.242/auth-service/oauth/token";
+	private static Logger logger = LoggerFactory.getLogger(PricingServiceImpl.class);
+	private Fulfillment fulfillmentResp;
 
-	@Mock
-	private CartResponse result;
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	final void testFetchCartDetails() {
+		result = new CartResponse();
+		try {
+			token = obtainAccessToken();
+		} catch (Exception e1) {
+			logger.error("Error getting cart", e1);
+		}
+		cartResp = new CartResp();
+		data = new CartItem[2];
+		CartItem cartItem = new CartItem();
+		cartItem.setSkuId("100");
+		cartItem.setQuantity(2);
+		data[0] = cartItem;
+		data[1] = cartItem;
+		cartResp.setData(data);
+		skuList = new ArrayList<Sku>();
+		Sku sku = new Sku();
+		sku.setId("abc");
+		sku.setId("100");
+		sku.setSaleprice(10);
+		sku.setListprice(10);
+		sku.setId("100");
+		sku.setParentproductid("100");
+		sku.setDescription("Men's wear");
+		sku.setName("prod");
+		List<Images> images = new ArrayList<Images>();
+		Images image = new Images();
+		image.setName("prod");
+		image.setUrl("www.google.com");
+		images.add(image);
+		sku.setImages(images);
+		skuList.add(sku);
+		items = new ArrayList<OrderItem>();
+		boolean priceMsg = true;
+		OrderItem item = new OrderItem(sku.getId(), sku.getId(), sku.getParentproductid(), 2,
+				new Double(sku.getListprice()), new Double(sku.getSaleprice()), (sku.getListprice() * 2),
+				new Double(sku.getListprice()), new Double((sku.getSaleprice() * 2)), priceMsg);
+
+		items.add(item);
+
+		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
+		when(productInfoServiceClients.getProductDetailsForSapecificItems("100,100")).thenReturn(skuList);
+		result.setActualTotal(0.0);
+		result.setTotal(0.0);
+		result.setSubtotal(0.0);
+
+		items.forEach(orderItem -> {
+			result.setActualTotal(orderItem.getItemsTotalPrice() + result.getActualTotal());
+			result.setSubtotal(orderItem.getItemDiscountedPrice() + result.getSubtotal());
+		});
+		result.setItems(items);
+
+		try {
+			result = pricingService.fetchCartDetails(token, "100");
+			assertNotNull(result);
+		} catch (CoCBusinessException | CoCSystemException e) {
+			fail("Price not calculated"); // TODO
+			e.printStackTrace();
+		}
 
 	}
 
-
 	@Test
-	public void testApplyItemPromotionForGivenItems() throws Exception {
-
-		token = "Bearer asKJSSLKajslASasjlAS";
+	final void testCalculateOrderPrice() {
+		try {
+			token = obtainAccessToken();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		fulfillmentItems = new ArrayList<FulfillmentItem>();
+		fulfillmentData = new Data();
 		cartResp = new CartResp();
 		data = new CartItem[2];
 		CartItem cartItem = new CartItem();
@@ -86,26 +166,121 @@ public class PricingServiceImplTest {
 		data[1] = cartItem;
 		cartResp.setData(data);
 		items = new ArrayList<OrderItem>();
+		FulfillmentItem fulfillitem = new FulfillmentItem();
 		OrderItem item = new OrderItem();
+		fulfillitem.setFulfillmentMethod("STANDARD");
+		fulfillitem.setPrice(new Double(5));
+		fulfillitem.setQuantity(2);
+		fulfillitem.setSkuId("100");
 		item.setListPrice(20);
 		item.setItemDescription("sadad");
 		item.setItemsTotalPrice(77);
 		item.setQuantity(2);
-		item.setSkuId("adasdsad");
+		item.setSkuId("100");
 		items.add(item);
 		// result.setItems(items);
 		skuList = new ArrayList<Sku>();
 		Sku sku = new Sku();
-		sku.setId("abc");
+		sku.setId("100");
+		sku.setSaleprice(10);
+		sku.setListprice(10);
+		sku.setId("100");
+		sku.setParentproductid("100");
+		sku.setDescription("Men's wear");
+		sku.setName("prod");
+		List<Images> images = new ArrayList<Images>();
+		Images image = new Images();
+		image.setName("prod");
+		image.setUrl("www.google.com");
+		images.add(image);
+		sku.setImages(images);
 		skuList.add(sku);
+		fulfillmentItems.add(fulfillitem);
+		fulfillmentResp = new Fulfillment();
+		fulfillmentData.setItems(fulfillmentItems);
+		fulfillmentResp.setData(fulfillmentData);
+		ResponseEntity<Fulfillment> repEntity = new ResponseEntity<Fulfillment>(fulfillmentResp, HttpStatus.OK);
 
+		when(fulfillmentServiceClient.getOrderFulFillmentDeatils(token)).thenReturn(repEntity);
 		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
 		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(skuList);
 
-		CartResponse result = pricingService.fetchCartDetails(token, "100");
-		assertNotNull(result);
+		OrderPriceResp result;
+		try {
+			result = pricingService.calculateOrderPrice(token);
+			assertNotNull(result);
+		} catch (CoCBusinessException e) {
+			fail("order details not found");
+			e.printStackTrace();
+		} catch (CoCSystemException e) {
+			fail("product details not found");
+			e.printStackTrace();
+		}
+
 	}
 
+	@Test
+	final void testFetchCartDetails_fail() {
+		result = null;
+		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(null);
+		when(productInfoServiceClients.getProductDetailsForSapecificItems("100,100")).thenReturn(null);
 
+		try {
+			result = pricingService.fetchCartDetails(token, "100");
+			// Assert.assertEquals(0.0, result.getTotal());
+		} catch (Exception e) {
+			assertTrue(true);
+			e.printStackTrace();
+		}
 
+	}
+
+	@Test
+	final void testCalculateOrderPrice_fail_fulfillment() {
+		when(fulfillmentServiceClient.getOrderFulFillmentDeatils(token)).thenReturn(null);
+		OrderPriceResp result;
+		try {
+			result = pricingService.calculateOrderPrice(token);
+			Assert.assertEquals(null, result);
+		} catch (Exception e) {
+			assertTrue(true);
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	final void testFetchProductDetails_fail() {
+		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(null);
+		List<OrderItem> itemDetails;
+		try {
+			itemDetails = pricingService.fetchProductDetails("100");
+			Assert.assertEquals(null, itemDetails);
+		} catch (Exception e) {
+			assertTrue(true);
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	final void testGetCartdetails() {
+		when(cartInfoServiceClients.getOrderDetails(token, null)).thenReturn(null);
+		try {
+			CartResponse itemDetails = pricingService.fetchCartDetails(token, null);
+			Assert.assertEquals(null, itemDetails);
+		} catch (Exception e) {
+			assertTrue(true);
+			e.printStackTrace();
+		}
+	}
+
+	private static String obtainAccessToken() throws Exception {
+
+		Response oauthResponse = RestAssured.given().auth().basic("web-client", "web-client-secret")
+				.formParam("grant_type", "client_credentials").when().post(OAUTH_SVC_URL).andReturn();
+
+		String access_token = oauthResponse.getBody().jsonPath().get("access_token");
+		return access_token;
+	}
 }

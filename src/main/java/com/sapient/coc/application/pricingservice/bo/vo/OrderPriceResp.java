@@ -7,6 +7,20 @@ import java.util.List;
 
 import com.sapient.coc.application.coreframework.bo.Money;
 
+/*******************************************************
+ * Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+ *
+ * This file is part of CommerceOnCloud project.
+ *
+ * CommerceOnCloud can not be copied and/or distributed without the express
+ * permission of PublicisSapient
+ *******************************************************/
+/**
+ * POJO to send order price response
+ * 
+ * @author pooyadav
+ *
+ */
 public class OrderPriceResp implements Serializable {
 
 	private static final long serialVersionUID = 2335688676823292750L;

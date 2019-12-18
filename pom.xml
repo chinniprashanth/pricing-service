@@ -30,7 +30,6 @@
         <sonar.exclusions>
 			**/com/sapient/coc/application/pricingservice/bo/**
 		</sonar.exclusions>
-        <io.cucumber.version>4.7.4</io.cucumber.version>
 	</properties>
 
 
@@ -109,7 +108,7 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.3.2</version>
-			
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
@@ -214,6 +213,24 @@
 			<artifactId>json-schema-validator</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>5.3.2</version>
+			<scope>test</scope>
+		</dependency>
+		  <dependency>
+		<groupId>com.vimalselvam</groupId>
+		<artifactId>cucumber-extentsreport</artifactId>
+		<version>3.0.2</version>
+	</dependency>
+
+ 	<dependency>
+		<groupId>com.aventstack</groupId>
+		<artifactId>extentreports</artifactId>
+		<version>3.1.2</version>
+	</dependency>
+		
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -300,18 +317,19 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
-                        <configuration>
-                            <!-- Sets the path to the file which contains the execution data. -->
-                            <dataFile>target/jacoco.exec</dataFile>
-                            <!-- Sets the output directory for the code coverage report. -->
-                            <outputDirectory>target/jacoco-ut</outputDirectory>
-                            <excludes>
-                            <exclude>**/bo/**</exclude>
+                       <configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<dataFile>target/jacoco.exec</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
+							<outputDirectory>target/jacoco-ut</outputDirectory>
+							<excludes>
+								<exclude>**/bo/**</exclude>
 								<exclude>**/cukes/**</exclude>
 								<exclude>**/stepdef/**</exclude>
-								<exclude>**/PricingserviceApplication.class</exclude>
-							</excludes> 
-                        </configuration>
+								<exclude>**/PricingServiceApplication.class</exclude>
+								<exclude>**/fallback/**</exclude>
+							</excludes>
+						</configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -22,7 +22,17 @@ public interface PricingService {
 	
 	public static final Logger logger = LoggerFactory.getLogger(PricingService.class);
 
-	default OrderResponse applyPromotions(String token, String cartId) throws CoCBusinessException, CoCSystemException {
+	/**
+	 * This method calculates total, subtotal
+	 * 
+	 * @param token
+	 * @param cartId
+	 * @return OrderResponse
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException
+	 */
+	default OrderResponse applyCartPricing(String token, String cartId)
+			throws CoCBusinessException, CoCSystemException {
 		
 		CartResponse cartResponse = fetchCartDetails(token, cartId);
 		OrderResponse orderResponse = new OrderResponse();
@@ -33,21 +43,35 @@ public interface PricingService {
 		return orderResponse;
 	}
 	
-	// Map<String, List<OrderResponse>> applyShippingPromotion(String orderId);
-	// CartResponse applyShippingPricing(String orderId);
-
-	// Map<String, List<PromotionFact>> applyItemPromotionForGivenItems(List<String>
-	// skuIds, Integer buyQty);
-	
+	/**
+	 * This method fetches cart details
+	 * 
+	 * @param token
+	 * @param cartId
+	 * @return CartResponse
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException
+	 */
 	CartResponse fetchCartDetails(String token, String cartId) throws CoCBusinessException, CoCSystemException;
 
+	/**
+	 * This method fetches product details
+	 * 
+	 * @param skuId
+	 * @return List<OrderItem>
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException
+	 */
 	List<OrderItem> fetchProductDetails(String skuId) throws CoCBusinessException, CoCSystemException;
 
-	OrderPriceResp calculateShipping(String authorization) throws CoCBusinessException, CoCSystemException;
-
-	// Map<String, List<PromotionFact>>
-	// applyCategoryAndItemPromotionForGivenItems(String skuIds, Integer buyQty);
-
-	// Map<String, OrderItem> getPromotionalProduct();
+	/**
+	 * This method calculates order pricing along with shipping price
+	 * 
+	 * @param authorization
+	 * @return OrderPriceResp
+	 * @throws CoCBusinessException
+	 * @throws CoCSystemException
+	 */
+	OrderPriceResp calculateOrderPrice(String authorization) throws CoCBusinessException, CoCSystemException;
 	
 }

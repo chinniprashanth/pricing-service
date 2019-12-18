@@ -14,10 +14,17 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-@FeignClient(name = "fulfillment-service", url = "http://35.241.4.242", fallback = FulfillmentServiceFalBack.class)
+@FeignClient(name = "fulfillment-service", url = "${application.fulfillment.client.url}", fallback = FulfillmentServiceFalBack.class)
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 
+	/**
+	 * The method fetches fulfillment details(chosen shipping method and price) for
+	 * a particular order
+	 * 
+	 * @param token
+	 * @return
+	 */
 	@RequestLine("GET /v1/fulfillment/methods/")
 	@Headers({ "Authorization: {token}", "Accept: application/json" })
 	@RequestMapping(value = " /v1/fulfillment/methods/", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

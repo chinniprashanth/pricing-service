@@ -4,6 +4,20 @@ import java.io.Serializable;
 
 import com.sapient.coc.application.coreframework.bo.Money;
 
+/*******************************************************
+ * Copyright (c) 2019 CommerceOnCloud, PublicisSapient
+ *
+ * This file is part of CommerceOnCloud project.
+ *
+ * CommerceOnCloud can not be copied and/or distributed without the express
+ * permission of PublicisSapient
+ *******************************************************/
+/**
+ * POJO to save order item price details
+ * 
+ * @author pooyadav
+ *
+ */
 public class OrderItemPrice implements Serializable {
 
 
