@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sapient.coc.application.coreframework.controller.BaseController;
 import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
 import com.sapient.coc.application.coreframework.exception.CoCSystemException;
+import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
-import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
 import io.swagger.annotations.Api;
@@ -61,7 +61,7 @@ public class PricingController extends BaseController {
 			"Pricing Service" })
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
-	public ResponseEntity<OrderResponse> applyItemPricing(@RequestHeader("Authorization") String authorization,
+	public ResponseEntity<CartResponse> applyItemPricing(@RequestHeader("Authorization") String authorization,
 			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId)
 			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyCartPricing method in PricingController for cart id {}", 0);

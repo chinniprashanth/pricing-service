@@ -10,7 +10,6 @@ import com.sapient.coc.application.coreframework.exception.CoCSystemException;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
-import com.sapient.coc.application.pricingservice.bo.vo.OrderResponse;
 
 /**
  * Copyright (c) 2019 CommerceOnCloud, PublicisSapient This file is part of
@@ -31,16 +30,14 @@ public interface PricingService {
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	default OrderResponse applyCartPricing(String token, String cartId)
+	default CartResponse applyCartPricing(String token, String cartId)
 			throws CoCBusinessException, CoCSystemException {
 		
 		CartResponse cartResponse = fetchCartDetails(token, cartId);
-		OrderResponse orderResponse = new OrderResponse();
 		if (cartResponse.getTotal() == 0) {
 			cartResponse.setTotal(cartResponse.getSubtotal() + cartResponse.getShipping() + cartResponse.getTax());
 		}
-		orderResponse.setItem(cartResponse);
-		return orderResponse;
+		return cartResponse;
 	}
 	
 	/**
