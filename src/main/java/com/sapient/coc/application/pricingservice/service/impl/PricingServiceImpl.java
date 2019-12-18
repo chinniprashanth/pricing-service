@@ -107,6 +107,7 @@ public class PricingServiceImpl implements PricingService {
 					itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(ids);
 					itemDetails.forEach(itemDetail -> {
 						boolean priceMsg = false;
+						if (null != itemDetail.getId()) {
 						OrderItem orderItem = new OrderItem(itemDetail.getId(), itemDetail.getId(),
 								itemDetail.getParentproductid(), qtySkuId.get(itemDetail.getId()),
 								new Double(itemDetail.getListprice()), new Double(itemDetail.getSaleprice()),
@@ -128,6 +129,7 @@ public class PricingServiceImpl implements PricingService {
 							orderItem.setPriceChanged(false);
 						}
 						orderItems.add(orderItem);
+						}
 					});
 
 					if (cartResponse.getSubtotal() == 0) {
