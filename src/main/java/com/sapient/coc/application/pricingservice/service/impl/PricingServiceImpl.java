@@ -324,9 +324,5 @@ public class PricingServiceImpl implements PricingService {
 		}
 	}
 
-	public long count() {
-		// logger.debug("check count of cart items");
-		return 1;
-	}
 
 }
