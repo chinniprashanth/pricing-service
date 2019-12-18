@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: pricing-service
   cloud:
     config:
       uri: http://35.223.134.168:12777
