@@ -70,6 +70,8 @@ public class PricingServiceImpl implements PricingService {
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
 
+	private boolean isProductAvaialble = true;
+
 	/**
 	 * Fetches the price details of a cart and does re-pricing as well
 	 *
@@ -129,9 +131,15 @@ public class PricingServiceImpl implements PricingService {
 							orderItem.setPriceChanged(false);
 						}
 						orderItems.add(orderItem);
+						} else {
+							isProductAvaialble = true;
+
 						}
 					});
-
+					if (isProductAvaialble) {
+						logger.error(ERROR_PRODUCT_DETAIL_MISSING);
+						throw new CoCSystemException(ERROR_PRODUCT_DETAIL_MISSING);
+					}
 					if (cartResponse.getSubtotal() == 0) {
 						orderItems.forEach(orderItem -> {
 							cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
