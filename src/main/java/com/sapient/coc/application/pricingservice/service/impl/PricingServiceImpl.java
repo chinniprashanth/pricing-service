@@ -173,6 +173,7 @@ public class PricingServiceImpl implements PricingService {
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
 		ResponseEntity<Fulfillment> fulfillmentResp;
+		productNotAvaialble = false;
 		try {
 			fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
 		} catch (Exception exc) {
@@ -198,6 +199,10 @@ public class PricingServiceImpl implements PricingService {
 			});
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			List<OrderItem> orderItems = fetchProductDetails(ids);
+			if (productNotAvaialble) {
+				logger.error(ERROR_PRODUCT_DETAIL_MISSING);
+				throw new CoCBusinessException(ERROR_PRODUCT_DETAIL_MISSING);
+			}
 			if (null != orderItems && orderItems.size() >= 1) {
 				List<OrderItemPrice> orderItemPrice = new ArrayList<OrderItemPrice>();
 
@@ -275,6 +280,7 @@ public class PricingServiceImpl implements PricingService {
 			itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(skuId);
 
 			itemDetails.forEach(itemDetail -> {
+				if (null != itemDetail.getId()) {
 				OrderItem orderItem = new OrderItem();
 				orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
 				orderItem.setListPrice(new Double(itemDetail.getListprice()));
@@ -284,7 +290,10 @@ public class PricingServiceImpl implements PricingService {
 				orderItem.setName(itemDetail.getName());
 				orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
 				orderItem.setItemId(itemDetail.getId());
-				orderItems.add(orderItem);
+					orderItems.add(orderItem);
+				} else {
+					productNotAvaialble = true;
+				}
 			});
 		} catch (Exception exc) {
 			logger.error(ERROR_PRODUCT_DETAIL_MISSING, exc);
