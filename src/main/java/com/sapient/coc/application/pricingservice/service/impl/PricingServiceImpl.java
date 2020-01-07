@@ -70,7 +70,7 @@ public class PricingServiceImpl implements PricingService {
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
 
-	private boolean productNotAvaialble = false;
+	private boolean productDetailNotAvaialble = false;
 
 	/**
 	 * Fetches the price details of a cart and does re-pricing as well
@@ -132,11 +132,11 @@ public class PricingServiceImpl implements PricingService {
 						}
 						orderItems.add(orderItem);
 						} else {
-							productNotAvaialble = true;
+							productDetailNotAvaialble = true;
 
 						}
 					});
-					if (productNotAvaialble) {
+					if (productDetailNotAvaialble) {
 						logger.error(ERROR_PRODUCT_DETAIL_MISSING);
 						throw new CoCSystemException(ERROR_PRODUCT_DETAIL_MISSING);
 					}
@@ -173,7 +173,7 @@ public class PricingServiceImpl implements PricingService {
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
 		ResponseEntity<Fulfillment> fulfillmentResp;
-		productNotAvaialble = false;
+		productDetailNotAvaialble = false;
 		try {
 			fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
 		} catch (Exception exc) {
@@ -199,7 +199,7 @@ public class PricingServiceImpl implements PricingService {
 			});
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			List<OrderItem> orderItems = fetchProductDetails(ids);
-			if (productNotAvaialble) {
+			if (productDetailNotAvaialble) {
 				logger.error(ERROR_PRODUCT_DETAIL_MISSING);
 				throw new CoCBusinessException(ERROR_PRODUCT_DETAIL_MISSING);
 			}
@@ -292,7 +292,7 @@ public class PricingServiceImpl implements PricingService {
 				orderItem.setItemId(itemDetail.getId());
 					orderItems.add(orderItem);
 				} else {
-					productNotAvaialble = true;
+					productDetailNotAvaialble = true;
 				}
 			});
 		} catch (Exception exc) {
