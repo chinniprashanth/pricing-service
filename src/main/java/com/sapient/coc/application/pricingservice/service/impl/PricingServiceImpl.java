@@ -156,6 +156,9 @@ public class PricingServiceImpl implements PricingService {
 				logger.error(NO_SKU);
 				throw new CoCBusinessException(NO_SKU);
 			}
+		} else {
+			logger.error(ERROR_GETTING_CART);
+			throw new CoCSystemException(ERROR_GETTING_CART);
 		}
 		logger.debug("Returning cart price details");
 		return cartResponse;
