@@ -6,7 +6,10 @@ import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.sapient.coc.application.pricingservice.bo.vo.Product;
 import com.sapient.coc.application.pricingservice.bo.vo.ProductDetail;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.FeignConfigurationPricing;
@@ -48,7 +51,7 @@ public interface ProductInfoServiceClient {
 	Sku getItemDetails(@Param(value = "id") String id);
 
 	/**
-	 * This method returns response from product API
+	 * This method returns response from productdetail API
 	 * 
 	 * @param query
 	 * @return
@@ -56,5 +59,15 @@ public interface ProductInfoServiceClient {
 	@Headers(HttpHeaders.CONTENT_TYPE + ":" + MediaType.APPLICATION_JSON_VALUE)
 	@RequestLine("GET /v2/products/id/{id}")
 	List<ProductDetail> getProductDetailsForSapecificProducts(@Param("id") String id);
+
+	/**
+	 * This method returns response from product API
+	 * 
+	 * @param query
+	 * @return
+	 */
+	@RequestLine("GET /v2/{id}")
+	@RequestMapping(value = "/v2/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	Product getProductDetails(@Param(value = "id") String id);
 
 }
