@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.sapient.coc.application.pricingservice.bo.vo.Product;
 import com.sapient.coc.application.pricingservice.bo.vo.ProductDetail;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
@@ -34,6 +35,12 @@ public class ProductInfoFallBack implements ProductInfoServiceClient {
 	public Sku getItemDetails(String id) {
 		// TODO Auto-generated method stub
 		return new Sku();
+	}
+
+	@Override
+	public Product getProductDetails(String id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
