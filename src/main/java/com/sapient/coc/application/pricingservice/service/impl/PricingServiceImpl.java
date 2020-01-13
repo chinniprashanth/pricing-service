@@ -91,8 +91,8 @@ public class PricingServiceImpl implements PricingService {
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
 
-	@Value(value = "${application.taxApply.allowed}")
-	private boolean taxEnabled;
+	// @Value(value = "${application.taxApply.allowed}")
+	private boolean taxEnabled = false;
 
 	private boolean productDetailNotAvailable = false;
 
