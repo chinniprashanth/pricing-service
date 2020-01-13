@@ -91,8 +91,8 @@ public class PricingServiceImpl implements PricingService {
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
 
-	// @Value(value = "${application.taxApply.allowed}")
-	private boolean taxEnabled = false;
+	@Value(value = "${application.taxApply.allowed}")
+	private boolean taxEnabled;
 
 	private boolean productDetailNotAvailable = false;
 
@@ -198,7 +198,7 @@ public class PricingServiceImpl implements PricingService {
 	public OrderPriceResp calculateOrderPrice(String token) throws CoCBusinessException, CoCSystemException {
 		logger.debug("Entering calculateOrderPrice method in PricingserviceImpl");
 
-		Tax taxi = taxServiceClient.getTax("12345", "40").getBody();
+		
 
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
