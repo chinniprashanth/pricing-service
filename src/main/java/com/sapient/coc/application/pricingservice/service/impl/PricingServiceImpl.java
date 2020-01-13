@@ -276,28 +276,7 @@ public class PricingServiceImpl implements PricingService {
 						orderResp.getShipping(), orderResp.getTotalDiscount(), new Money(CURRENCY, 0.0),
 						orderResp.getId());
 				orderResp.setOrderItems(orderItems);
-				if (taxEnabled) {
-					ResponseEntity<Order> order = null;
-					try {
-						order = orderServiceClient.getCurrentOrder(token);
-						if (null != order && null != order.getBody().getData()
-								&& null != order.getBody().getData().getId()) {
-							String orderId = order.getBody().getData().getId();
-							String taxAmount = getTaxdetails(orderId, token, orderResp.getTotal().getAmount())
-									.toString();
-							orderResp.setTax(new Money(CURRENCY, new Double(Integer.parseInt(taxAmount))));
-							orderResp.setTotal(new Money(CURRENCY,
-									new Double(orderResp.getTotal().getAmount() + Integer.parseInt(taxAmount))));
-						} else {
-							logger.error(ORDER_ID_NOT_AVAILABLE);
-							throw new CoCSystemException(ORDER_ID_NOT_AVAILABLE);
-						}
-					} catch (Exception exc) {
-						logger.error(ERROR_GETTING_ORDER, exc);
-						throw new CoCSystemException(ERROR_GETTING_ORDER);
-					}
-
-				}
+				
 				try {
 					sendMessage(orderKafkaResp);
 
