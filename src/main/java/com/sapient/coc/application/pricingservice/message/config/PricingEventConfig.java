@@ -16,6 +16,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.sapient.coc.application.coreframework.message.config.BaseKafkaConsumerConfig;
 import com.sapient.coc.application.coreframework.message.config.KafkaJsonDeserializer;
+import com.sapient.coc.application.pricingservice.bo.vo.AddressVO;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 
 /*******************************************************
@@ -41,6 +42,9 @@ public class PricingEventConfig extends BaseKafkaConsumerConfig {
 
 	@Autowired
 	private LocalValidatorFactoryBean validator;
+
+	@Value(value = "${spring.kafka.addressGroupId}")
+	private String addresGroupId;
 
 	/**
 	 * Creates a Consumer Factory for a price kind of a message. Consumer Factory is
@@ -71,6 +75,39 @@ public class PricingEventConfig extends BaseKafkaConsumerConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, CartResponse> pricingConsumerFactory() {
 		ConcurrentKafkaListenerContainerFactory<String, CartResponse> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(getconsumerFactory());
+
+		return factory;
+	}
+
+	/**
+	 * Creates a Consumer Factory for a price kind of a message. Consumer Factory is
+	 * made available as a bean named consumerFactory in Application Context
+	 *
+	 * @return ConsumerFactory
+	 */
+
+	@Bean
+	public ConsumerFactory<String, AddressVO> getaddConsumerFactory() {
+		Map<String, Object> configs = configs();
+		configs.put(ConsumerConfig.GROUP_ID_CONFIG, addresGroupId);
+
+		return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(),
+				new KafkaJsonDeserializer<>(Map.class));
+	}
+
+	/**
+	 * Creates a Kafka Listener Container Factory for Map type messages. Listener
+	 * Factory is made available as a bean named kafkaListenerContainerFactory in
+	 * Application Context. Uses consumerFactory() for the creating the Map listener
+	 * factory.
+	 *
+	 * @return Kafka Map Listener Container Factory
+	 */
+
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, AddressVO> addressConsumerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, AddressVO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(getaddConsumerFactory());
 
 		return factory;
 	}

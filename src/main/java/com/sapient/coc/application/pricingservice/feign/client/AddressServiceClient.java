@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.sapient.coc.application.pricingservice.bo.vo.BillingAdd;
+import com.sapient.coc.application.pricingservice.bo.vo.BillingAddress;
 
 import feign.Headers;
 import feign.Param;
@@ -30,8 +30,8 @@ public interface AddressServiceClient {
 	 * @return
 	 */
 	@RequestLine("GET /v1/address/shipping/order/{orderId}")
-	@Headers({ "Authorization: bearer {token}", "Accept: application/json", "Content-Type: application/json" })
+	@Headers({ "Authorization: {token}", "Accept: application/json", "Content-Type: application/json" })
 	@RequestMapping(value = "/v1/address/shipping/order/{orderId}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<BillingAdd> getShippingAddress(@Param("orderId") String orderId,
+	public ResponseEntity<BillingAddress> getShippingAddress(@Param("orderId") String orderId,
 			@Param("token") String token);
 }
