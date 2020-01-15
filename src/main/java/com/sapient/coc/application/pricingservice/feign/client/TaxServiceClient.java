@@ -30,7 +30,8 @@ public interface TaxServiceClient {
 	 * @return
 	 */
 	@RequestLine("GET /v1/tax/{zipCode}/{amount}")
-	@Headers({ "Authorization: bearer {token}", "Accept: application/json", "Content-Type: application/json" })
+	@Headers({ "Authorization: {token}", "Accept: application/json", "Content-Type: application/json" })
 	@RequestMapping(value = "/v1/tax/{zipCode}/{amount}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Tax> getTax(@Param("zipCode") String zipCode, @Param("amount") String amount);
+	public ResponseEntity<Tax> getTax(@Param("zipCode") String zipCode, @Param("amount") String amount,
+			@Param("token") String token);
 }

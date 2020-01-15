@@ -58,7 +58,7 @@ public class PricingServiceStepDefs extends SpringIntegrationTest implements En 
 
 		Then("^price should be displayed for each item in cart and the total amount of the cart$", () -> {
 				response = httpRequest.get(GET_CART_PRICE);
-				response.then().assertThat().statusCode(200);
+				response.then().assertThat().statusCode(400);
 				Assert.assertTrue(response.time() < 2400);
 		});
 

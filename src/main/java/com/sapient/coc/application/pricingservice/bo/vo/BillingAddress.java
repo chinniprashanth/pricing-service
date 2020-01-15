@@ -11,14 +11,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * permission of PublicisSapient
  *******************************************************/
 
-public class BillingAdd {
+public class BillingAddress {
 
 	private int code;
 	private String status;
 	@JsonProperty("data")
 	AddressVO addressVO;
 
-	public BillingAdd() {
+	public BillingAddress() {
 
 	}
 

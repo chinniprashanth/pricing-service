@@ -19,14 +19,14 @@ import org.springframework.stereotype.Service;
 import com.sapient.coc.application.coreframework.bo.Money;
 import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
 import com.sapient.coc.application.coreframework.exception.CoCSystemException;
-import com.sapient.coc.application.pricingservice.bo.vo.BillingAdd;
+import com.sapient.coc.application.pricingservice.bo.vo.AddressVO;
+import com.sapient.coc.application.pricingservice.bo.vo.BillingAddress;
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Data;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
-import com.sapient.coc.application.pricingservice.bo.vo.Order;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItemPrice;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderKafkaResponse;
@@ -34,6 +34,7 @@ import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.ShippingResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.bo.vo.Tax;
+import com.sapient.coc.application.pricingservice.cache.CacheDao;
 import com.sapient.coc.application.pricingservice.feign.client.AddressServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
@@ -66,6 +67,8 @@ public class PricingServiceImpl implements PricingService {
 	private static final String ERROR_GETTING_TAX = "Error getting tax";
 	private static final String CURRENCY = "USD";
 	private static final String ORDER_ID_NOT_AVAILABLE = "Order Id is not available";
+	private static final String ADDRESS_KEY = "CoC-Shipping-Addr";
+
 
 	@Autowired
 	ProductInfoServiceClient productInfoServiceClient;
@@ -88,6 +91,9 @@ public class PricingServiceImpl implements PricingService {
 	@Autowired
 	TaxServiceClient taxServiceClient;
 
+	@Autowired
+	private CacheDao redis;
+
 	@Value(value = "${spring.kafka.message.topic.name}")
 	private String topicName;
 
@@ -95,6 +101,7 @@ public class PricingServiceImpl implements PricingService {
 	private boolean taxEnabled;
 
 	private boolean productDetailNotAvailable = false;
+	private static String orderId = null;
 
 	/**
 	 * Fetches the price details of a cart and does re-pricing as well
@@ -198,8 +205,6 @@ public class PricingServiceImpl implements PricingService {
 	public OrderPriceResp calculateOrderPrice(String token) throws CoCBusinessException, CoCSystemException {
 		logger.debug("Entering calculateOrderPrice method in PricingserviceImpl");
 
-		
-
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
 		ResponseEntity<Fulfillment> fulfillmentResp;
@@ -212,6 +217,7 @@ public class PricingServiceImpl implements PricingService {
 		}
 		if (null != fulfillmentResp.getBody() && null != fulfillmentResp.getBody().getData()) {
 			Data fulfillmentData = fulfillmentResp.getBody().getData();
+			orderId = fulfillmentData.getId();
 			List<FulfillmentItem> itemList = fulfillmentData.getItems();
 			Map<String, ShippingResponse> shippingDetailsMap = new HashMap<String, ShippingResponse>();
 			Map<String, Double> priceMap = new HashMap<String, Double>();
@@ -276,7 +282,24 @@ public class PricingServiceImpl implements PricingService {
 						orderResp.getShipping(), orderResp.getTotalDiscount(), new Money(CURRENCY, 0.0),
 						orderResp.getId());
 				orderResp.setOrderItems(orderItems);
-				
+				if (taxEnabled) {
+					try {
+						if (null != orderId) {
+							Double taxAmount = getTaxdetails(orderId, token, orderResp.getActualTotal().getAmount())
+									.doubleValue();
+							orderResp.setTax(new Money(CURRENCY, new Double(taxAmount)));
+							orderResp.setTotal(new Money(CURRENCY,
+									new Double(orderResp.getActualTotal().getAmount() + (taxAmount))));
+						} else {
+							logger.error(ORDER_ID_NOT_AVAILABLE);
+							throw new CoCSystemException(ORDER_ID_NOT_AVAILABLE);
+						}
+					} catch (Exception exc) {
+						logger.error(ERROR_GETTING_ORDER, exc);
+						throw new CoCSystemException(ERROR_GETTING_ORDER);
+					}
+
+				}
 				try {
 					sendMessage(orderKafkaResp);
 
@@ -375,6 +398,7 @@ public class PricingServiceImpl implements PricingService {
 		}
 	}
 
+
 	/**
 	 * This method calls tax service feign client
 	 * 
@@ -387,21 +411,36 @@ public class PricingServiceImpl implements PricingService {
 	public BigDecimal getTaxdetails(String orderId, String token, Double totalAmount)
 			throws CoCSystemException, CoCBusinessException {
 		logger.debug("Entering getTaxdetails method in PricingServiceImpl");
-		ResponseEntity<BillingAdd> addressResp = null;
+		ResponseEntity<BillingAddress> addressResp = null;
 		Tax tax = null;
+		String zipcode = null;
 		if (null == orderId) {
 			logger.debug(ORDER_ID_REQUIRED);
 			throw new CoCBusinessException(ORDER_ID_REQUIRED);
 		} else {
 			try {
-				addressResp = addressServiceClient.getShippingAddress(orderId, token);
-				String zipcode = addressResp.getBody().getAddressVO().getZipcode();
+				Map<String, AddressVO> cachedData = redis.findAddressById(ADDRESS_KEY + orderId);
+				if (null != cachedData && !cachedData.isEmpty()) {
+					AddressVO addr = (AddressVO) cachedData.get("methods");
+					if (null != addr && null != addr.getZipcode()) {
+						zipcode = addr.getZipcode();
+					}
+				}
+				if (null == zipcode) {
+					addressResp = addressServiceClient.getShippingAddress(orderId, token);
+					if (null != addressResp && null != addressResp.getBody()
+							&& null != addressResp.getBody().getAddressVO()
+							&& null != addressResp.getBody().getAddressVO().getZipcode()) {
+						zipcode = addressResp.getBody().getAddressVO().getZipcode();
+						redis.save(ADDRESS_KEY + orderId, addressResp.getBody().getAddressVO());
+					}
+				}
 				if (null != zipcode) {
 					try {
-						tax = taxServiceClient.getTax(zipcode, totalAmount.toString()).getBody();
-						if (null != tax && null != tax.getTaxDetails() && null != tax.getTaxDetails().getTaxAmount()) {
+						tax = taxServiceClient.getTax(zipcode, totalAmount.toString(), token).getBody();
+						if (null != tax && null != tax.getData() && !tax.getData().isEmpty()) {
 							logger.debug("Exit getTaxdetails method in PricingServiceImpl");
-							return tax.getTaxDetails().getTaxAmount();
+							return new BigDecimal(tax.getData());
 						} else {
 							logger.error("tax not available");
 							return new BigDecimal(0);
@@ -410,6 +449,7 @@ public class PricingServiceImpl implements PricingService {
 						logger.error(ERROR_GETTING_TAX, exce);
 						throw new CoCSystemException(ERROR_GETTING_TAX);
 					}
+
 				} else {
 					logger.error("zip code not available");
 					throw new CoCSystemException("zip code not available");

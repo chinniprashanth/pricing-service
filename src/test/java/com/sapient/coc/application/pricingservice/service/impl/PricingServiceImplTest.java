@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 
 import com.sapient.coc.application.coreframework.exception.CoCBusinessException;
 import com.sapient.coc.application.coreframework.exception.CoCSystemException;
+import com.sapient.coc.application.pricingservice.bo.vo.AddressVO;
+import com.sapient.coc.application.pricingservice.bo.vo.BillingAddress;
 import com.sapient.coc.application.pricingservice.bo.vo.CartItem;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResp;
 import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
@@ -33,9 +37,13 @@ import com.sapient.coc.application.pricingservice.bo.vo.Images;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
+import com.sapient.coc.application.pricingservice.bo.vo.Tax;
+import com.sapient.coc.application.pricingservice.cache.CacheDao;
+import com.sapient.coc.application.pricingservice.feign.client.AddressServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.CartInfoServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.FulfillmentServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServiceClient;
+import com.sapient.coc.application.pricingservice.feign.client.TaxServiceClient;
 import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
@@ -57,7 +65,28 @@ class PricingServiceImplTest {
 	private FulfillmentServiceClient fulfillmentServiceClient;
 
 	@Mock
+	private TaxServiceClient taxServiceClient;
+
+	@Mock
+	private AddressServiceClient addressServiceClient;
+
+	@Mock
 	private PricingEventPublisher pricingEventPublisher;
+
+	@Mock
+	private CacheDao redis;
+
+	@Mock
+	private BillingAddress addrMock;
+
+	@Mock
+	private ResponseEntity<BillingAddress> responseEntityAddressMock;
+
+	@Mock
+	private ResponseEntity<Tax> responseEntityTax;
+
+	@Mock
+	private Tax taxMock;
 
 	@MockBean
 	private CartResponse orderResponse = null;
@@ -67,6 +96,7 @@ class PricingServiceImplTest {
 
 	private static CartItem[] data;
 	private static CartResponse result;
+	private static AddressVO addressVO;
 	private List<OrderItem> items;
 	private List<Sku> skuList;
 	private static String token;
@@ -75,9 +105,13 @@ class PricingServiceImplTest {
 	private static final String OAUTH_SVC_URL = "http://35.241.4.242/auth-service/oauth/token";
 	private static Logger logger = LoggerFactory.getLogger(PricingServiceImpl.class);
 	private Fulfillment fulfillmentResp;
+	private static String orderId = "22e78960-bdf4-11e9-a34b-6bcec6d1fa67";
+	private static final String ADDRESS_KEY = "CoC-Shipping-Addr";
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		addressVO = new AddressVO();
+		addressVO.setZipcode("12345");
 	}
 
 	@BeforeEach
@@ -273,6 +307,30 @@ class PricingServiceImplTest {
 			assertTrue(true);
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	final void testGetTaxdetails_if_zipcode_inCache() {
+		Map<String, AddressVO> cachedData = new HashMap<String, AddressVO>();
+		Tax tax = new Tax();
+		tax.setData("45.56");
+		cachedData.put(ADDRESS_KEY + orderId, addressVO);
+		when(redis.findAddressById(ADDRESS_KEY + orderId)).thenReturn(cachedData);
+		when(responseEntityTax.getBody()).thenReturn(taxMock);
+		when(taxServiceClient.getTax(addressVO.getZipcode(), "20", token)).thenReturn(responseEntityTax);
+	}
+
+	@Test
+	final void testGetTaxdetails_if_cache_is_empty() {
+		Map<String, AddressVO> cachedData = new HashMap<String, AddressVO>();
+		Tax tax = new Tax();
+		taxMock.setData("45.56");
+		cachedData.put(ADDRESS_KEY + orderId, addressVO);
+		addrMock.setAddressVO(addressVO);
+		when(responseEntityAddressMock.getBody()).thenReturn(addrMock);
+		when(addressServiceClient.getShippingAddress(orderId, token)).thenReturn(responseEntityAddressMock);
+		when(responseEntityTax.getBody()).thenReturn(taxMock);
+		when(taxServiceClient.getTax(addressVO.getZipcode(), "20", token)).thenReturn(responseEntityTax);
 	}
 
 	private static String obtainAccessToken() throws Exception {

@@ -15,11 +15,13 @@ public class Tax {
 
 	private int code;
 	private String status;
-	private TaxDetails taxDetails;
 	@JsonProperty("traceId")
 	private String traceid;
 	@JsonProperty("spanId")
 	private String spanid;
+
+	@JsonProperty("data")
+	private String data;
 
 	public void setCode(int code) {
 		this.code = code;
@@ -53,11 +55,12 @@ public class Tax {
 		return spanid;
 	}
 
-	public TaxDetails getTaxDetails() {
-		return taxDetails;
+	public String getData() {
+		return data;
 	}
 
-	public void setTaxDetails(TaxDetails taxDetails) {
-		this.taxDetails = taxDetails;
+	public void setData(String data) {
+		this.data = data;
 	}
+
 }
