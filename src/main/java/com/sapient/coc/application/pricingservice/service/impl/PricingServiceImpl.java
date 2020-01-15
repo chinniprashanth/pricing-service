@@ -433,6 +433,9 @@ public class PricingServiceImpl implements PricingService {
 							&& null != addressResp.getBody().getAddressVO().getZipcode()) {
 						zipcode = addressResp.getBody().getAddressVO().getZipcode();
 						redis.save(ADDRESS_KEY + orderId, addressResp.getBody().getAddressVO());
+					} else {
+						logger.error("zip code not available");
+						return new BigDecimal(0);
 					}
 				}
 				if (null != zipcode) {
