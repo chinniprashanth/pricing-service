@@ -32,10 +32,10 @@ public class Sku {
     private Reviewsandratings reviewsandratings;
 
     @JsonProperty("salePrice")
-    private int saleprice;
+	private Double saleprice;
 
     @JsonProperty("listPrice")
-    private int listprice;
+	private Double listprice;
 
     @JsonProperty("itemPromotionDescription")
     private String itempromotiondescription;
@@ -136,19 +136,19 @@ public class Sku {
         this.reviewsandratings = reviewsandratings;
     }
 
-    public int getSaleprice() {
+	public Double getSaleprice() {
         return saleprice;
     }
 
-    public void setSaleprice(int saleprice) {
+	public void setSaleprice(Double saleprice) {
         this.saleprice = saleprice;
     }
 
-    public int getListprice() {
+	public Double getListprice() {
         return listprice;
     }
 
-    public void setListprice(int listprice) {
+	public void setListprice(Double listprice) {
         this.listprice = listprice;
     }
 
