@@ -147,7 +147,6 @@ public class PricingServiceImpl implements PricingService {
 								(itemDetail.getListprice() * qtySkuId.get(itemDetail.getId())),
 								new Double(itemDetail.getListprice()),
 								new Double((itemDetail.getSaleprice() * qtySkuId.get(itemDetail.getId()))), priceMsg);
-							orderItem.setItemPrice(new Double(10.99));
 						if (null != cartMap.get(itemDetail.getId()).getWasPrice()
 								&& null != cartMap.get(itemDetail.getId()).getWasPrice().getValue()) {
 							orderItem.setWasPrice(
