@@ -139,8 +139,8 @@ class PricingServiceImplTest {
 		Sku sku = new Sku();
 		sku.setId("abc");
 		sku.setId("100");
-		sku.setSaleprice(10);
-		sku.setListprice(10);
+		sku.setSaleprice(new Double(10));
+		sku.setListprice(new Double(10));
 		sku.setId("100");
 		sku.setParentproductid("100");
 		sku.setDescription("Men's wear");
@@ -216,8 +216,8 @@ class PricingServiceImplTest {
 		skuList = new ArrayList<Sku>();
 		Sku sku = new Sku();
 		sku.setId("100");
-		sku.setSaleprice(10);
-		sku.setListprice(10);
+		sku.setSaleprice(new Double(10));
+		sku.setListprice(new Double(10));
 		sku.setId("100");
 		sku.setParentproductid("100");
 		sku.setDescription("Men's wear");

@@ -147,6 +147,7 @@ public class PricingServiceImpl implements PricingService {
 								(itemDetail.getListprice() * qtySkuId.get(itemDetail.getId())),
 								new Double(itemDetail.getListprice()),
 								new Double((itemDetail.getSaleprice() * qtySkuId.get(itemDetail.getId()))), priceMsg);
+							orderItem.setItemPrice(new Double(10.99));
 						if (null != cartMap.get(itemDetail.getId()).getWasPrice()
 								&& null != cartMap.get(itemDetail.getId()).getWasPrice().getValue()) {
 							orderItem.setWasPrice(
@@ -176,6 +177,7 @@ public class PricingServiceImpl implements PricingService {
 							cartResponse.setActualTotal(orderItem.getItemsTotalPrice() + cartResponse.getActualTotal());
 							cartResponse.setSubtotal(orderItem.getItemDiscountedPrice() + cartResponse.getSubtotal());
 						});
+						cartResponse.setTotalDiscount(cartResponse.getActualTotal() - cartResponse.getSubtotal());
 						cartResponse.setItems(orderItems);
 					}
 				} catch (Exception exec) {
@@ -275,7 +277,8 @@ public class PricingServiceImpl implements PricingService {
 					orderItemPrice.add(itemPrice);
 
 				});
-				orderResp.setSubtotal(new Money(CURRENCY, orderResp.getSubtotal().getAmount() + total));
+				// orderResp.setSubtotal(new Money(CURRENCY, orderResp.getSubtotal().getAmount()
+				// + total));
 				orderKafkaResp = new OrderKafkaResponse("Created", token, orderItemPrice,
 						fulfillmentData.getCreatedAt(),
 						new Date(), orderResp.getSubtotal(), orderResp.getTotal(), orderResp.getActualTotal(),
@@ -289,7 +292,7 @@ public class PricingServiceImpl implements PricingService {
 									.doubleValue();
 							orderResp.setTax(new Money(CURRENCY, new Double(taxAmount)));
 							orderResp.setTotal(new Money(CURRENCY,
-									new Double(orderResp.getActualTotal().getAmount() + (taxAmount))));
+									new Double(orderResp.getSubtotal().getAmount() + (taxAmount) + total)));
 						} else {
 							logger.error(ORDER_ID_NOT_AVAILABLE);
 							throw new CoCSystemException(ORDER_ID_NOT_AVAILABLE);
@@ -299,6 +302,8 @@ public class PricingServiceImpl implements PricingService {
 						throw new CoCSystemException(ERROR_GETTING_ORDER);
 					}
 
+				} else {
+					orderResp.setTotal(new Money(CURRENCY, new Double(orderResp.getSubtotal().getAmount() + (total))));
 				}
 				try {
 					sendMessage(orderKafkaResp);
