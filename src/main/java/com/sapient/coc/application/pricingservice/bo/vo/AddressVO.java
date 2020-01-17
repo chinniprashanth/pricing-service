@@ -18,7 +18,8 @@ import com.sapient.coc.application.coreframework.bo.BaseEntityDto;
 @XmlRootElement(name = "Address")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AddressVO extends BaseEntityDto {
-
+	
+	private static final long serialVersionUID = 8269160490373210497L;
 	private String addressLine1;
 	private String addressLine2;
 	private String city;
