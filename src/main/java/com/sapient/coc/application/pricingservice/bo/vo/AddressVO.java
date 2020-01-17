@@ -31,13 +31,14 @@ public class AddressVO extends BaseEntityDto {
 	private String orderId;
 	private boolean isDefault;
 	private boolean saveToAdressBook;
+	private String state;
 
 	public AddressVO() {
 
 	}
 
 	public AddressVO(String addressLine1, String addressLine2, String city, String country, String zipcode, String mobile,
-			String type) {
+			String type, String state) {
 		super();
 		this.addressLine1 = addressLine1;
 		this.addressLine2 = addressLine2;
@@ -46,6 +47,7 @@ public class AddressVO extends BaseEntityDto {
 		this.zipcode = zipcode;
 		this.mobile = mobile;
 		this.addressType = type;
+		this.state = state;
 	}
 
 	public String getAddressLine1() {
@@ -148,7 +150,15 @@ public class AddressVO extends BaseEntityDto {
 	public String toString() {
 		return "Address [addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city
 				+ ", country=" + country + ", zipcode=" + zipcode + ", mobile=" + mobile + ", type=" + addressType
-				+ "]";
+				+ ", state=" + state + "]";
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 }
