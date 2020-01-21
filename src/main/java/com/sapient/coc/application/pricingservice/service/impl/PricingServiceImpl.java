@@ -299,10 +299,10 @@ public class PricingServiceImpl implements PricingService {
 				} else {
 					orderResp.setTotal(new Money(CURRENCY, new Double(orderResp.getSubtotal().getAmount() + (total))));
 				}
-					orderKafkaResp = new OrderKafkaResponse("Created", token, orderItemPrice,
+				orderKafkaResp = new OrderKafkaResponse("CREATED", token, orderItemPrice,
 						fulfillmentData.getCreatedAt(),
 						new Date(), orderResp.getSubtotal(), orderResp.getTotal(), orderResp.getActualTotal(),
-						orderResp.getShipping(), orderResp.getTotalDiscount(), new Money(CURRENCY, 0.0),
+						orderResp.getShipping(), orderResp.getTotalDiscount(), orderResp.getTax(),
 						orderResp.getId());
 				orderResp.setOrderItems(orderItems);
 				try {
