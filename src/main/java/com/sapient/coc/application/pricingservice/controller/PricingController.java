@@ -62,10 +62,11 @@ public class PricingController extends BaseController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "cartId  ", value = "cart id", required = true, dataType = "String") })
 	public ResponseEntity<CartResponse> applyItemPricing(@RequestHeader("Authorization") String authorization,
+			@RequestHeader("Client") String client,
 			@ApiParam(value = "Cart Id for which pricing need to be applied", required = true) @PathVariable String cartId)
 			throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyCartPricing method in PricingController for cart id {}", 0);
-		return Optional.ofNullable(pricingService.applyCartPricing(authorization, cartId))
+		return Optional.ofNullable(pricingService.applyCartPricing(authorization, cartId, client))
 				.map(result -> ResponseEntity.ok().body(result))
 				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}

@@ -173,7 +173,7 @@ class PricingServiceImplTest {
 		result.setItems(items);
 
 		try {
-			result = pricingService.fetchCartDetails(token, "100");
+			result = pricingService.fetchCartDetails(token, "100", "coc");
 			assertNotNull(result);
 		} catch (CoCBusinessException | CoCSystemException e) {
 			fail("Price not calculated"); // TODO
@@ -260,7 +260,7 @@ class PricingServiceImplTest {
 		when(productInfoServiceClients.getProductDetailsForSapecificItems("100,100")).thenReturn(null);
 
 		try {
-			result = pricingService.fetchCartDetails(token, "100");
+			result = pricingService.fetchCartDetails(token, "100", "coc");
 			// Assert.assertEquals(0.0, result.getTotal());
 		} catch (Exception e) {
 			assertTrue(true);
@@ -301,7 +301,7 @@ class PricingServiceImplTest {
 	final void testGetCartdetails() {
 		when(cartInfoServiceClients.getOrderDetails(token, null)).thenReturn(null);
 		try {
-			CartResponse itemDetails = pricingService.fetchCartDetails(token, null);
+			CartResponse itemDetails = pricingService.fetchCartDetails(token, null, "coc");
 			Assert.assertEquals(null, itemDetails);
 		} catch (Exception e) {
 			assertTrue(true);
