@@ -29,8 +29,10 @@ import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Data;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
+import com.sapient.coc.application.pricingservice.bo.vo.NiemenDetail;
 import com.sapient.coc.application.pricingservice.bo.vo.NiemenProduct;
 import com.sapient.coc.application.pricingservice.bo.vo.NiemenRequest;
+import com.sapient.coc.application.pricingservice.bo.vo.NiemenResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.NiemenSku;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderEvent;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
@@ -368,7 +370,7 @@ public class PricingServiceImpl implements PricingService {
 					promoAmount = applyPromotion(token, orderItems, orderResp.getSubtotal().getAmount());
 					if (null != promoAmount) {
 						orderResp.setTotal(new Money(CURRENCY,
-								applyPromotion(token, orderItems, orderResp.getSubtotal().getAmount())
+								promoAmount
 								+ orderResp.getTax().getAmount() + orderResp.getShipping().getAmount()));
 						orderResp.setTotalDiscount(
 								new Money(CURRENCY, orderResp.getSubtotal().getAmount() - promoAmount));
