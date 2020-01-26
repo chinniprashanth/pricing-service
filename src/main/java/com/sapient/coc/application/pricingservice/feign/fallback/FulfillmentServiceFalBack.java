@@ -15,4 +15,10 @@ public class FulfillmentServiceFalBack implements FulfillmentServiceClient {
 		return null;
 	}
 
+	@Override
+	public ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(String token, String orderId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

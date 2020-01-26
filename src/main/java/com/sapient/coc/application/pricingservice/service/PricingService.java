@@ -69,6 +69,7 @@ public interface PricingService {
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	OrderPriceResp calculateOrderPrice(String authorization) throws CoCBusinessException, CoCSystemException;
+	OrderPriceResp calculateOrderPrice(String authorization, String orderId)
+			throws CoCBusinessException, CoCSystemException;
 	
 }

@@ -74,20 +74,23 @@ public class PricingController extends BaseController {
 	 * API to fetch order pricing details
 	 * 
 	 * @param authorization
+	 * @param orderId
 	 * @return
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	@RequestMapping(value = "/order", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = { "/order", "/order/{orderId}" }, method = RequestMethod.GET, produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Applied shipping and order pricing ", response = ResponseEntity.class),
 			@ApiResponse(code = 400, message = "Bad Request | order not found") })
 	@ApiOperation(value = "${applyOrderPricing.ApiOperation.value}", notes = "${applyOrderPricing.ApiOperation.notes}", httpMethod = "GET", produces = "application/json", responseContainer = "Map", tags = {
 			"Pricing Service" })
-	public ResponseEntity<OrderPriceResp> applyOrderPricing(@RequestHeader("Authorization") String authorization)
-			throws CoCBusinessException, CoCSystemException {
+	public ResponseEntity<OrderPriceResp> applyOrderPricing(@RequestHeader("Authorization") String authorization,
+			@PathVariable Optional<String> orderId) throws CoCBusinessException, CoCSystemException {
 		logger.info("Entering the applyOrderPricing method in PricingController for cart id {}", 0);
-		return Optional.ofNullable(pricingService.calculateOrderPrice(authorization))
+		return Optional
+				.ofNullable(pricingService.calculateOrderPrice(authorization,
+						orderId.isPresent() ? orderId.get() : null))
 				.map(result -> ResponseEntity.ok().body(result))
 				.orElseThrow(() -> new CoCBusinessException(CANT_FETCH_PRICING));
 	}

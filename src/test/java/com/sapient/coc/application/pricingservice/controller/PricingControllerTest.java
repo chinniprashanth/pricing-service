@@ -203,9 +203,28 @@ public class PricingControllerTest {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
 			ObjectMapper objectMapper = new ObjectMapper();
-			when(pricingService.calculateOrderPrice(token)).thenReturn(orderPriceResp);
+			when(pricingService.calculateOrderPrice(token, null)).thenReturn(orderPriceResp);
 			this.mockMvc
 					.perform(get("/pricing/order").contentType(MediaType.APPLICATION_JSON)
+							.header("Authorization", token).content(objectMapper.writeValueAsString(orderPriceResp)))
+					.andExpect(status().is2xxSuccessful());
+		} catch (Exception e) {
+			Assert.fail("Get pricing method failed in Controller");
+			logger.error("Get pricing method in Controller", e);
+		}
+
+	}
+
+	@Test
+	public void testApplyOrderPricingByOrderId() throws Exception {
+
+		try {
+			requestParams = new JSONObject();
+			requestParams.put("orderId", "1");
+			ObjectMapper objectMapper = new ObjectMapper();
+			when(pricingService.calculateOrderPrice(token, "1")).thenReturn(orderPriceResp);
+			this.mockMvc
+					.perform(get("/pricing/order/1").contentType(MediaType.APPLICATION_JSON)
 							.header("Authorization", token).content(objectMapper.writeValueAsString(orderPriceResp)))
 					.andExpect(status().is2xxSuccessful());
 		} catch (Exception e) {
@@ -222,7 +241,7 @@ public class PricingControllerTest {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
 			ObjectMapper objectMapper = new ObjectMapper();
-			when(pricingService.calculateOrderPrice(token)).thenReturn(null);
+			when(pricingService.calculateOrderPrice(token, null)).thenReturn(null);
 			this.mockMvc.perform(get("/pricing/order").contentType(MediaType.APPLICATION_JSON)
 					.header("Authorization", token).content(objectMapper.writeValueAsString(orderPriceResp)));
 		} catch (Exception e) {
