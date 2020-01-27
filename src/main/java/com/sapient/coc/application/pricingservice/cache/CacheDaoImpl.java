@@ -57,7 +57,7 @@ public class CacheDaoImpl implements CacheDao {
 	 * @return Map<String, AddressVO>
 	 */
 	public Map<String, AddressVO> findAddressById(String key) {
-		logger.debug("Finding Available Fulfillment Methods in Cache {} ", key);
+		logger.debug("Finding Available address zipcode in Cache {} ", key);
 		Map<String, AddressVO> entries = hashOperations.entries(key);
 
 		if (ObjectUtils.isEmpty(entries)) {
@@ -76,7 +76,7 @@ public class CacheDaoImpl implements CacheDao {
 	 */
 	@Override
 	public boolean save(String key, AddressVO value) {
-		logger.debug("Saving Available Fulfillment Methods in Cache {} ", key);
+		logger.debug("Saving Available zipcode in Cache {} ", key);
 		if (null != value && null != value.getZipcode() && !value.getZipcode().isEmpty()) {
 			hashOperations.put(key, "methods", value);
 			return true;
@@ -87,7 +87,7 @@ public class CacheDaoImpl implements CacheDao {
 	}
 
 	/**
-	 * Check if an item already exists in cache
+	 * Check if a zipcode already exists in cache
 	 *
 	 * @param key
 	 * @return

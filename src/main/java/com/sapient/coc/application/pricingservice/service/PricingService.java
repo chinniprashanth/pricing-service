@@ -30,10 +30,10 @@ public interface PricingService {
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	default CartResponse applyCartPricing(String token, String cartId)
+	default CartResponse applyCartPricing(String token, String cartId, String client)
 			throws CoCBusinessException, CoCSystemException {
 		
-		CartResponse cartResponse = fetchCartDetails(token, cartId);
+		CartResponse cartResponse = fetchCartDetails(token, cartId, client);
 		if (cartResponse.getTotal() == 0) {
 			cartResponse.setTotal(cartResponse.getSubtotal() + cartResponse.getShipping() + cartResponse.getTax());
 		}
@@ -49,7 +49,8 @@ public interface PricingService {
 	 * @throws CoCBusinessException
 	 * @throws CoCSystemException
 	 */
-	CartResponse fetchCartDetails(String token, String cartId) throws CoCBusinessException, CoCSystemException;
+	CartResponse fetchCartDetails(String token, String cartId, String client)
+			throws CoCBusinessException, CoCSystemException;
 
 	/**
 	 * This method fetches product details

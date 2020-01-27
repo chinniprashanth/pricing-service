@@ -148,7 +148,7 @@ public class PricingControllerTest {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
 			ObjectMapper objectMapper = new ObjectMapper();
-			when(pricingService.applyCartPricing(token, "100")).thenReturn(cartResposne);
+			when(pricingService.applyCartPricing(token, "100", "coc")).thenReturn(cartResposne);
 			this.mockMvc
 					.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
 							.header("Authorization", token).content(objectMapper.writeValueAsString(cartResposne)))
@@ -167,7 +167,7 @@ public class PricingControllerTest {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
 			ObjectMapper objectMapper = new ObjectMapper();
-			when(pricingService.applyCartPricing(token, "100")).thenReturn(null);
+			when(pricingService.applyCartPricing(token, "100", "coc")).thenReturn(null);
 			this.mockMvc.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
 					.header("Authorization", token).content(objectMapper.writeValueAsString(cartResposne)));
 		} catch (Exception e) {
@@ -182,7 +182,7 @@ public class PricingControllerTest {
 		String abc = null;
 		requestParams = new JSONObject();
 		requestParams.put("cartId", abc);
-		when(pricingService.applyCartPricing(token, null)).thenReturn(null);
+		when(pricingService.applyCartPricing(token, null, "coc")).thenReturn(null);
 		this.mockMvc.perform(get("/pricing/items/abc")).andExpect(status().is5xxServerError());
 	}
 
@@ -191,8 +191,8 @@ public class PricingControllerTest {
 
 		requestParams = new JSONObject();
 		requestParams.put("cartId", "");
-		when(pricingService.fetchCartDetails(token, null)).thenReturn(null);
-		when(pricingService.applyCartPricing(token, null)).thenReturn(null);
+		when(pricingService.fetchCartDetails(token, null, "coc")).thenReturn(null);
+		when(pricingService.applyCartPricing(token, null, "coc")).thenReturn(null);
 		this.mockMvc.perform(get("/pricing/items/")).andExpect(status().is4xxClientError());
 	}
 
