@@ -158,36 +158,7 @@ public class PricingServiceImpl implements PricingService {
 				qtySkuId.put(cartItem.getSkuId(), cartItem.getQuantity());
 				cartMap.put(cartItem.getSkuId(), cartItem);
 			});
-			if (client.equalsIgnoreCase("Niemens")) {
-				String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
-				String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
-						+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
-						+ "url\n" + "}\n" + "salePrice\n" + "listPrice\n" + "}\n" + "}\n}";
-				List<NiemenSku> niemenRequest = new ArrayList<NiemenSku>();
-				for (Map.Entry<String, CartItem> entry : cartMap.entrySet()) {
-					String prod = entry.getValue().getProductId();
-					String skuid = entry.getValue().getSkuId();
-					NiemenSku sku = new NiemenSku();
-					sku.setProductId(prod);
-					sku.setSkuId(skuid);
-					niemenRequest.add(sku);
-				}
-
-				/*
-				 * NiemenSku sku1 = new NiemenSku(); sku1.setProductId("prod125470116");
-				 * sku1.setSkuId("sku99850748"); NiemenSku sku2 = new NiemenSku();
-				 * sku2.setProductId("prod143610208"); sku2.setSkuId("sku113670584");
-				 * niemenRequest.add(sku1); niemenRequest.add(sku2);
-				 */
-				String niemenObj = niemenRequest.toString();
-				String finalNiemenRequest = graphQlReq + niemenObj + graphQlReq2;
-				NiemenRequest request = new NiemenRequest();
-				request.setQuery(finalNiemenRequest);
-				NiemenResponse resp = graphServiceClient.getNiemenProduct(request);
-				NiemenDetail prodi = resp.getNiemProduct();
-				NiemenProduct productfinal = prodi.getNiemProduct();
-				itemDetails = productfinal.getSku();
-			}
+			itemDetails = handleNiemenProduct(client, itemDetails, cartMap);
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			if (!ids.isEmpty()) {
 				try {
@@ -258,6 +229,48 @@ public class PricingServiceImpl implements PricingService {
 		}
 		logger.debug("Returning cart price details");
 		return cartResponse;
+	}
+
+	/**
+	 * Method to fetch product details from correcponding price
+	 * 
+	 * @param client
+	 * @param itemDetails
+	 * @param cartMap
+	 * @return
+	 */
+	private List<Sku> handleNiemenProduct(String client, List<Sku> itemDetails, Map<String, CartItem> cartMap) {
+		if (client.equalsIgnoreCase("Niemens")) {
+			String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
+			String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
+					+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
+					+ "url\n" + "}\n" + "salePrice\n" + "listPrice\n" + "}\n" + "}\n}";
+			List<NiemenSku> niemenRequest = new ArrayList<NiemenSku>();
+			for (Map.Entry<String, CartItem> entry : cartMap.entrySet()) {
+				String prod = entry.getValue().getProductId();
+				String skuid = entry.getValue().getSkuId();
+				NiemenSku sku = new NiemenSku();
+				sku.setProductId(prod);
+				sku.setSkuId(skuid);
+				niemenRequest.add(sku);
+			}
+
+			/*
+			 * NiemenSku sku1 = new NiemenSku(); sku1.setProductId("prod125470116");
+			 * sku1.setSkuId("sku99850748"); NiemenSku sku2 = new NiemenSku();
+			 * sku2.setProductId("prod143610208"); sku2.setSkuId("sku113670584");
+			 * niemenRequest.add(sku1); niemenRequest.add(sku2);
+			 */
+			String niemenObj = niemenRequest.toString();
+			String finalNiemenRequest = graphQlReq + niemenObj + graphQlReq2;
+			NiemenRequest request = new NiemenRequest();
+			request.setQuery(finalNiemenRequest);
+			NiemenResponse resp = graphServiceClient.getNiemenProduct(request);
+			NiemenDetail prodi = resp.getNiemProduct();
+			NiemenProduct productfinal = prodi.getNiemProduct();
+			itemDetails = productfinal.getSku();
+		}
+		return itemDetails;
 	}
 
 	/**
