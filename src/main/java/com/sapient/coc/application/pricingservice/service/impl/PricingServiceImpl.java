@@ -29,11 +29,6 @@ import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Data;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenDetail;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenProduct;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenRequest;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenResponse;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenSku;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderEvent;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItemPrice;
@@ -54,6 +49,11 @@ import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServic
 import com.sapient.coc.application.pricingservice.feign.client.PromotionServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.TaxServiceClient;
 import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenDetail;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenProduct;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenRequest;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenResponse;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenSku;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
 /**

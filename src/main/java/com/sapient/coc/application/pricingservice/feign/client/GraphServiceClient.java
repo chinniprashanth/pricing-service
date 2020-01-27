@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenRequest;
-import com.sapient.coc.application.pricingservice.service.impl.NiemenResponse;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenRequest;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenResponse;
 
 import feign.Headers;
 import feign.RequestLine;
