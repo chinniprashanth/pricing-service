@@ -1,7 +1,6 @@
-package com.sapient.coc.application.pricingservice.bo.vo;
+package com.sapient.coc.application.pricingservice.niemen.bo.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenProduct;
 
 public class NiemenDetail {
 	@JsonProperty("getNMProduct")

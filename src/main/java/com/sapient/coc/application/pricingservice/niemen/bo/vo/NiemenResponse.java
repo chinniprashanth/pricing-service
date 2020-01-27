@@ -1,4 +1,4 @@
-package com.sapient.coc.application.pricingservice.bo.vo;
+package com.sapient.coc.application.pricingservice.niemen.bo.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
