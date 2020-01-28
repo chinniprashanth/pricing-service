@@ -276,11 +276,13 @@ public class PricingServiceImpl implements PricingService {
 	/**
 	 * Fetches the price details of a order item
 	 *
-	 * @param String token
+	 * @param token
+	 * @param requestOrderId
 	 * @return OrderPriceResp Object
 	 */
 	@Override
-	public OrderPriceResp calculateOrderPrice(String token) throws CoCBusinessException, CoCSystemException {
+	public OrderPriceResp calculateOrderPrice(String token, String requestOrderId)
+			throws CoCBusinessException, CoCSystemException {
 		logger.debug("Entering calculateOrderPrice method in PricingserviceImpl");
 
 		OrderPriceResp orderResp = new OrderPriceResp();
@@ -288,7 +290,11 @@ public class PricingServiceImpl implements PricingService {
 		ResponseEntity<Fulfillment> fulfillmentResp;
 		productDetailNotAvailable = false;
 		try {
-			fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
+			if (requestOrderId != null) {
+				fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token, requestOrderId);
+			} else {
+				fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token);
+			}
 		} catch (Exception exc) {
 			logger.error(ERROR_FULFILLMENT_MISSING, exc);
 			throw new CoCSystemException(ERROR_FULFILLMENT_MISSING);

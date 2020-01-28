@@ -241,7 +241,7 @@ class PricingServiceImplTest {
 
 		OrderPriceResp result;
 		try {
-			result = pricingService.calculateOrderPrice(token);
+			result = pricingService.calculateOrderPrice(token, null);
 			assertNotNull(result);
 		} catch (CoCBusinessException e) {
 			fail("order details not found");
@@ -274,7 +274,7 @@ class PricingServiceImplTest {
 		when(fulfillmentServiceClient.getOrderFulFillmentDeatils(token)).thenReturn(null);
 		OrderPriceResp result;
 		try {
-			result = pricingService.calculateOrderPrice(token);
+			result = pricingService.calculateOrderPrice(token, null);
 			Assert.assertEquals(null, result);
 		} catch (Exception e) {
 			assertTrue(true);

@@ -30,5 +30,19 @@ public interface FulfillmentServiceClient {
 	@RequestMapping(value = " /v1/fulfillment/methods/", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token);
 
+	/**
+	 * The method fetches fulfillment details(chosen shipping method and price) for
+	 * a particular order based on the orderId
+	 * 
+	 * @param token
+	 * @param orderId
+	 * @return
+	 */
+	@RequestLine("GET /v1/fulfillment/methods/{orderId}")
+	@Headers({ "Authorization: {token}", "Accept: application/json" })
+	@RequestMapping(value = " /v1/fulfillment/methods/{orderId}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Fulfillment> getOrderFulFillmentDeatils(@Param("token") String token,
+			@Param("orderId") String orderId);
+
 }
 
