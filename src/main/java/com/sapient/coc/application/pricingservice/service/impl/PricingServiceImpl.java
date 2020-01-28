@@ -81,7 +81,7 @@ public class PricingServiceImpl implements PricingService {
 	private static final String ORDER_ID_NOT_AVAILABLE = "Order Id is not available";
 	private static final String ADDRESS_KEY = "CoC-Shipping-Addr";
 	private static final String PROMOTION_ERROR = "Promotion service returned error";
-	private static final String CLIENT = "Niemens";
+	private static final String CLIENT = "Niemen";
 
 
 	@Autowired
@@ -240,7 +240,7 @@ public class PricingServiceImpl implements PricingService {
 	 * @return
 	 */
 	private List<Sku> handleNiemenProduct(String client, List<Sku> itemDetails, Map<String, CartItem> cartMap) {
-		if (client.equalsIgnoreCase("Niemens")) {
+		if (client.equalsIgnoreCase(CLIENT)) {
 			String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
 			String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
 					+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
@@ -266,8 +266,8 @@ public class PricingServiceImpl implements PricingService {
 			NiemenRequest request = new NiemenRequest();
 			request.setQuery(finalNiemenRequest);
 			NiemenResponse resp = graphServiceClient.getNiemenProduct(request);
-			NiemenDetail prodi = resp.getNiemProduct();
-			NiemenProduct productfinal = prodi.getNiemProduct();
+			NiemenDetail niemenDetail = resp.getNiemProduct();
+			NiemenProduct productfinal = niemenDetail.getNiemProduct();
 			itemDetails = productfinal.getSku();
 		}
 		return itemDetails;
