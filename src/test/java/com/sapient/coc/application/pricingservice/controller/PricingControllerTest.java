@@ -150,7 +150,7 @@ public class PricingControllerTest {
 			requestParams.put("cartId", "100");
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", token);
-			headers.add("Client", "coc");
+			headers.add("ClientId", "coc");
 			ObjectMapper objectMapper = new ObjectMapper();
 			when(pricingService.applyCartPricing(token, "100", "coc")).thenReturn(cartResposne);
 			this.mockMvc

@@ -162,7 +162,7 @@ public class PricingServiceImpl implements PricingService {
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			if (!ids.isEmpty()) {
 				try {
-					if (!client.equalsIgnoreCase(CLIENT)) {
+					if (null == client || !client.equalsIgnoreCase(CLIENT)) {
 						itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(ids);
 					}
 					itemDetails.forEach(itemDetail -> {
@@ -240,7 +240,7 @@ public class PricingServiceImpl implements PricingService {
 	 * @return
 	 */
 	private List<Sku> handleNiemenProduct(String client, List<Sku> itemDetails, Map<String, CartItem> cartMap) {
-		if (client.equalsIgnoreCase(CLIENT)) {
+		if (null != client && client.equalsIgnoreCase(CLIENT)) {
 			String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
 			String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
 					+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
