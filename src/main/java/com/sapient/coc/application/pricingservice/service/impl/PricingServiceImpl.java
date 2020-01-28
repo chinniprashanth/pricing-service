@@ -232,7 +232,7 @@ public class PricingServiceImpl implements PricingService {
 	}
 
 	/**
-	 * Method to fetch product details from correcponding price
+	 * Method to fetch product details from client API
 	 * 
 	 * @param client
 	 * @param itemDetails
