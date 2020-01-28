@@ -29,11 +29,6 @@ import com.sapient.coc.application.pricingservice.bo.vo.CartResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.Data;
 import com.sapient.coc.application.pricingservice.bo.vo.Fulfillment;
 import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenDetail;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenProduct;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenRequest;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenResponse;
-import com.sapient.coc.application.pricingservice.bo.vo.NiemenSku;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderEvent;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItemPrice;
@@ -54,6 +49,11 @@ import com.sapient.coc.application.pricingservice.feign.client.ProductInfoServic
 import com.sapient.coc.application.pricingservice.feign.client.PromotionServiceClient;
 import com.sapient.coc.application.pricingservice.feign.client.TaxServiceClient;
 import com.sapient.coc.application.pricingservice.message.PricingEventPublisher;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenDetail;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenProduct;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenRequest;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenResponse;
+import com.sapient.coc.application.pricingservice.niemen.bo.vo.NiemenSku;
 import com.sapient.coc.application.pricingservice.service.PricingService;
 
 /**
@@ -81,7 +81,7 @@ public class PricingServiceImpl implements PricingService {
 	private static final String ORDER_ID_NOT_AVAILABLE = "Order Id is not available";
 	private static final String ADDRESS_KEY = "CoC-Shipping-Addr";
 	private static final String PROMOTION_ERROR = "Promotion service returned error";
-	private static final String CLIENT = "Niemens";
+	private static final String CLIENT = "Niemen";
 
 
 	@Autowired
@@ -158,36 +158,7 @@ public class PricingServiceImpl implements PricingService {
 				qtySkuId.put(cartItem.getSkuId(), cartItem.getQuantity());
 				cartMap.put(cartItem.getSkuId(), cartItem);
 			});
-			if (client.equalsIgnoreCase("Niemens")) {
-				String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
-				String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
-						+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
-						+ "url\n" + "}\n" + "salePrice\n" + "listPrice\n" + "}\n" + "}\n}";
-				List<NiemenSku> niemenRequest = new ArrayList<NiemenSku>();
-				for (Map.Entry<String, CartItem> entry : cartMap.entrySet()) {
-					String prod = entry.getValue().getProductId();
-					String skuid = entry.getValue().getSkuId();
-					NiemenSku sku = new NiemenSku();
-					sku.setProductId(prod);
-					sku.setSkuId(skuid);
-					niemenRequest.add(sku);
-				}
-
-				/*
-				 * NiemenSku sku1 = new NiemenSku(); sku1.setProductId("prod125470116");
-				 * sku1.setSkuId("sku99850748"); NiemenSku sku2 = new NiemenSku();
-				 * sku2.setProductId("prod143610208"); sku2.setSkuId("sku113670584");
-				 * niemenRequest.add(sku1); niemenRequest.add(sku2);
-				 */
-				String niemenObj = niemenRequest.toString();
-				String finalNiemenRequest = graphQlReq + niemenObj + graphQlReq2;
-				NiemenRequest request = new NiemenRequest();
-				request.setQuery(finalNiemenRequest);
-				NiemenResponse resp = graphServiceClient.getNiemenProduct(request);
-				NiemenDetail prodi = resp.getNiemProduct();
-				NiemenProduct productfinal = prodi.getNiemProduct();
-				itemDetails = productfinal.getSku();
-			}
+			itemDetails = handleNiemenProduct(client, itemDetails, cartMap);
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			if (!ids.isEmpty()) {
 				try {
@@ -258,6 +229,48 @@ public class PricingServiceImpl implements PricingService {
 		}
 		logger.debug("Returning cart price details");
 		return cartResponse;
+	}
+
+	/**
+	 * Method to fetch product details from client API
+	 * 
+	 * @param client
+	 * @param itemDetails
+	 * @param cartMap
+	 * @return
+	 */
+	private List<Sku> handleNiemenProduct(String client, List<Sku> itemDetails, Map<String, CartItem> cartMap) {
+		if (client.equalsIgnoreCase(CLIENT)) {
+			String graphQlReq = "{\n  getNMProduct" + "(nmProductInput: ";
+			String graphQlReq2 = ")" + "{\ncode\nstatus\ndata" + " {\nid\nname" + "\n" + "description\n"
+					+ "parentProductID\n" + "attributes" + "{\nname" + "\nvalue" + "\ndescription\n" + "id\n"
+					+ "url\n" + "}\n" + "salePrice\n" + "listPrice\n" + "}\n" + "}\n}";
+			List<NiemenSku> niemenRequest = new ArrayList<NiemenSku>();
+			for (Map.Entry<String, CartItem> entry : cartMap.entrySet()) {
+				String prod = entry.getValue().getProductId();
+				String skuid = entry.getValue().getSkuId();
+				NiemenSku sku = new NiemenSku();
+				sku.setProductId(prod);
+				sku.setSkuId(skuid);
+				niemenRequest.add(sku);
+			}
+
+			/*
+			 * NiemenSku sku1 = new NiemenSku(); sku1.setProductId("prod125470116");
+			 * sku1.setSkuId("sku99850748"); NiemenSku sku2 = new NiemenSku();
+			 * sku2.setProductId("prod143610208"); sku2.setSkuId("sku113670584");
+			 * niemenRequest.add(sku1); niemenRequest.add(sku2);
+			 */
+			String niemenObj = niemenRequest.toString();
+			String finalNiemenRequest = graphQlReq + niemenObj + graphQlReq2;
+			NiemenRequest request = new NiemenRequest();
+			request.setQuery(finalNiemenRequest);
+			NiemenResponse resp = graphServiceClient.getNiemenProduct(request);
+			NiemenDetail niemenDetail = resp.getNiemProduct();
+			NiemenProduct productfinal = niemenDetail.getNiemProduct();
+			itemDetails = productfinal.getSku();
+		}
+		return itemDetails;
 	}
 
 	/**

@@ -14,7 +14,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-@FeignClient(name = "fulfillment-service", url = "${application.fulfillment.client.url}", fallback = FulfillmentServiceFalBack.class)
+@FeignClient(name = "fulfillment-service", url = "http://35.241.4.242", fallback = FulfillmentServiceFalBack.class)
 @RibbonClient(name = "fulfillment-service")
 public interface FulfillmentServiceClient {
 

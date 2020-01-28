@@ -55,6 +55,7 @@ public class PricingServiceStepDefs extends SpringIntegrationTest implements En 
 			httpRequest.header("Authorization", token);
 			httpPriceRequest.header("Content-Type", "application/json");
 			httpPriceRequest.header("Authorization", token);
+			httpPriceRequest.header("Client", "coc");
 			JSONObject addToCartReq = new JSONObject();
 			addToCartReq.put("productId", productId);
 			addToCartReq.put("quantity", quantity);

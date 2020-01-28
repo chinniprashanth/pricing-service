@@ -1,8 +1,9 @@
-package com.sapient.coc.application.pricingservice.bo.vo;
+package com.sapient.coc.application.pricingservice.niemen.bo.vo;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 
 /*******************************************************
  * Copyright (c) 2019 CommerceOnCloud, PublicisSapient
