@@ -387,6 +387,7 @@ public class PricingServiceImpl implements PricingService {
 								+ orderResp.getTax().getAmount() + orderResp.getShipping().getAmount()));
 						orderResp.setTotalDiscount(
 								new Money(CURRENCY, orderResp.getSubtotal().getAmount() - promoAmount));
+						orderResp.setSubtotal(new Money(CURRENCY, promoAmount));
 					}
 				}
 				orderKafkaResp = new OrderKafkaResponse("CREATED", token, orderItemPrice,
