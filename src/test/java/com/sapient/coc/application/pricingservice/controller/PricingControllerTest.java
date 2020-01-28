@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -147,11 +148,15 @@ public class PricingControllerTest {
 		try {
 			requestParams = new JSONObject();
 			requestParams.put("cartId", "100");
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", token);
+			headers.add("Client", "coc");
 			ObjectMapper objectMapper = new ObjectMapper();
 			when(pricingService.applyCartPricing(token, "100", "coc")).thenReturn(cartResposne);
 			this.mockMvc
 					.perform(get("/pricing/items/100").contentType(MediaType.APPLICATION_JSON)
-							.header("Authorization", token).content(objectMapper.writeValueAsString(cartResposne)))
+							.headers(headers)
+							.content(objectMapper.writeValueAsString(cartResposne)))
 					.andExpect(status().is2xxSuccessful());
 		} catch (Exception e) {
 			Assert.fail("Get pricing method failed in Controller");
