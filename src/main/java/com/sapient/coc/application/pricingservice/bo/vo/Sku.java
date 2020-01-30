@@ -31,27 +31,37 @@ public class Sku {
     @JsonProperty("reviewsAndRatings")
     private Reviewsandratings reviewsandratings;
 
-    @JsonProperty("salePrice")
-	private Double saleprice;
+	@JsonProperty("prices")
+	private List<Price> price;
 
-    @JsonProperty("listPrice")
-	private Double listprice;
+	private String category_id;
 
-    @JsonProperty("itemPromotionDescription")
-    private String itempromotiondescription;
+	@JsonProperty("category_ids")
+	private List<String> category_ids;
 
-    @JsonProperty("categoryPromotionDescription")
-    private String categorypromotiondescription;
+	@JsonProperty("category_names")
+	private List<String> category_names;
 
-    @JsonProperty("productPromotionDescription")
-    private String productpromotiondescription;
+	/*
+	 * @JsonProperty("salePrice") private Double saleprice;
+	 * 
+	 * @JsonProperty("listPrice") private Double listprice;
+	 */
 
-    @JsonProperty("inventory-service")
-    private List<SkuInventory> inventory;
-
-    @JsonProperty("inventoryAvailability")
-    private int inventoryavailability;
-
+	/*
+	 * @JsonProperty("itemPromotionDescription") private String
+	 * itempromotiondescription;
+	 * 
+	 * @JsonProperty("categoryPromotionDescription") private String
+	 * categorypromotiondescription;
+	 * 
+	 * @JsonProperty("productPromotionDescription") private String
+	 * productpromotiondescription;
+	 * 
+	 * @JsonProperty("inventory-service") private List<SkuInventory> inventory;
+	 * 
+	 * @JsonProperty("inventoryAvailability") private int inventoryavailability;
+	 */
     public String getId() {
         return id;
     }
@@ -136,60 +146,38 @@ public class Sku {
         this.reviewsandratings = reviewsandratings;
     }
 
-	public Double getSaleprice() {
-        return saleprice;
-    }
+	public List<Price> getPrice() {
+		return price;
+	}
 
-	public void setSaleprice(Double saleprice) {
-        this.saleprice = saleprice;
-    }
+	public void setPrice(List<Price> price) {
+		this.price = price;
+	}
 
-	public Double getListprice() {
-        return listprice;
-    }
+	public String getCategory_id() {
+		return category_id;
+	}
 
-	public void setListprice(Double listprice) {
-        this.listprice = listprice;
-    }
+	public void setCategory_id(String category_id) {
+		this.category_id = category_id;
+	}
 
-    public String getItempromotiondescription() {
-        return itempromotiondescription;
-    }
+	public List<String> getCategory_ids() {
+		return category_ids;
+	}
 
-    public void setItempromotiondescription(String itempromotiondescription) {
-        this.itempromotiondescription = itempromotiondescription;
-    }
+	public void setCategory_ids(List<String> category_ids) {
+		this.category_ids = category_ids;
+	}
 
-    public List<SkuInventory> getInventory() {
-        return inventory;
-    }
+	public List<String> getCategory_names() {
+		return category_names;
+	}
 
-    public void setInventory(final List<SkuInventory> inventory) {
-        this.inventory = inventory;
-    }
+	public void setCategory_names(List<String> category_names) {
+		this.category_names = category_names;
+	}
 
-    public String getCategorypromotiondescription() {
-        return categorypromotiondescription;
-    }
 
-    public void setCategorypromotiondescription(String categorypromotiondescription) {
-        this.categorypromotiondescription = categorypromotiondescription;
-    }
-
-    public String getProductpromotiondescription() {
-        return productpromotiondescription;
-    }
-
-    public void setProductpromotiondescription(String productpromotiondescription) {
-        this.productpromotiondescription = productpromotiondescription;
-    }
-
-    public int getInventoryavailability() {
-        return inventoryavailability;
-    }
-
-    public void setInventoryavailability(int inventoryavailability) {
-        this.inventoryavailability = inventoryavailability;
-    }
 
 }

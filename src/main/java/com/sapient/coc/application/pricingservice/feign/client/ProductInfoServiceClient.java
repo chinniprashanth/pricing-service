@@ -26,7 +26,7 @@ import feign.RequestLine;
  */
 @FeignClient(name = "productDetail", configuration = FeignConfigurationPricing.class,
 //, fallback = ProductInfoFallBack.class 
-		url = "${application.product.client.url}")
+		url = "https://dev.rapidcommerce.io/api/")
 @RibbonClient(name="product-detail")
 public interface ProductInfoServiceClient {
 
@@ -69,5 +69,16 @@ public interface ProductInfoServiceClient {
 	@RequestLine("GET /v2/{id}")
 	@RequestMapping(value = "/v2/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Product getProductDetails(@Param(value = "id") String id);
+
+	/**
+	 * This method returns response from category info API
+	 * 
+	 * @param query
+	 * @return
+	 */
+	// https://dev.rapidcommerce.io/api/productdetail
+	@RequestLine("GET /v2/items/categoryinfo/{id}")
+	@RequestMapping(value = "/v2/items/categoryinfo/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	List<Sku> getProductCatInfo(@Param(value = "id") String id);
 
 }

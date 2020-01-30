@@ -16,12 +16,12 @@ package com.sapient.coc.application.pricingservice.bo.vo;
  */
 public class Price {
     private String type;
-    private String value;
+	private double value;
 
     public Price() {
     }
 
-    public Price(String type, String value) {
+	public Price(String type, Double value) {
         this.type = type;
         this.value = value;
     }
@@ -34,11 +34,11 @@ public class Price {
         this.type = type;
     }
 
-    public String getValue() {
+	public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+	public void setValue(double value) {
         this.value = value;
     }
 }

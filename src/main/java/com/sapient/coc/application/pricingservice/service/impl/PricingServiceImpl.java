@@ -34,6 +34,7 @@ import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItemPrice;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderKafkaResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
+import com.sapient.coc.application.pricingservice.bo.vo.Price;
 import com.sapient.coc.application.pricingservice.bo.vo.PromoResponse;
 import com.sapient.coc.application.pricingservice.bo.vo.PromotionWrapper;
 import com.sapient.coc.application.pricingservice.bo.vo.ShippingResponse;
@@ -82,6 +83,8 @@ public class PricingServiceImpl implements PricingService {
 	private static final String ADDRESS_KEY = "CoC-Shipping-Addr";
 	private static final String PROMOTION_ERROR = "Promotion service returned error";
 	private static final String CLIENT = "Niemen";
+	private static final String RETURN_CART_DETAILS = "Returning cart price details";
+	private static final String ERROR_PUBLISHING_KAFKA = "Error publishing Kafka messgae";
 
 
 	@Autowired
@@ -163,27 +166,35 @@ public class PricingServiceImpl implements PricingService {
 			if (!ids.isEmpty()) {
 				try {
 					if (null == client || !client.equalsIgnoreCase(CLIENT)) {
-						itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(ids);
+						itemDetails = productInfoServiceClient.getProductCatInfo(ids);
 					}
 					itemDetails.forEach(itemDetail -> {
+						List<Price> priceList = itemDetail.getPrice();
+						Map<String, Double> itemPriceMap = priceList.stream()
+								.collect(Collectors.toMap(Price::getType, Price::getValue));
+						if (null == itemPriceMap.get("salePrices")) {
+							itemPriceMap.put("salePrices", itemPriceMap.get("listPrices"));
+						}
 						boolean priceMsg = false;
 						if (null != itemDetail.getId()) {
 						OrderItem orderItem = new OrderItem(itemDetail.getId(), itemDetail.getId(),
 								itemDetail.getParentproductid(), qtySkuId.get(itemDetail.getId()),
-								new Double(itemDetail.getListprice()), new Double(itemDetail.getSaleprice()),
-								(itemDetail.getListprice() * qtySkuId.get(itemDetail.getId())),
-								new Double(itemDetail.getListprice()),
-								new Double((itemDetail.getSaleprice() * qtySkuId.get(itemDetail.getId()))), priceMsg);
+									new Double(itemPriceMap.get("listPrices")),
+									new Double(itemPriceMap.get("salePrices")),
+									(itemPriceMap.get("listPrices") * qtySkuId.get(itemDetail.getId())),
+									new Double(itemPriceMap.get("listPrices")),
+									new Double((itemPriceMap.get("salePrices") * qtySkuId.get(itemDetail.getId()))),
+									priceMsg);
 						if (null != cartMap.get(itemDetail.getId()).getWasPrice()
-								&& null != cartMap.get(itemDetail.getId()).getWasPrice().getValue()) {
+									&& 0 != cartMap.get(itemDetail.getId()).getWasPrice().getValue()) {
 							orderItem.setWasPrice(
-										Double.parseDouble(cartMap.get(itemDetail.getId()).getWasPrice().getValue()));
+										(cartMap.get(itemDetail.getId()).getWasPrice().getValue()));
 						} else {
-								orderItem.setWasPrice(itemDetail.getListprice());
+								orderItem.setWasPrice(itemPriceMap.get("listPrices"));
 						}
 
-						if (orderItem.getWasPrice() > itemDetail.getSaleprice()
-								|| orderItem.getWasPrice() < itemDetail.getSaleprice()) {
+							if (orderItem.getWasPrice() > itemPriceMap.get("salePrices")
+									|| orderItem.getWasPrice() < itemPriceMap.get("salePrices")) {
 							orderItem.setPriceChanged(true);
 						} else {
 							orderItem.setPriceChanged(false);
@@ -227,7 +238,7 @@ public class PricingServiceImpl implements PricingService {
 			logger.error(ERROR_GETTING_CART);
 			throw new CoCSystemException(ERROR_GETTING_CART);
 		}
-		logger.debug("Returning cart price details");
+		logger.debug(RETURN_CART_DETAILS);
 		return cartResponse;
 	}
 
@@ -399,8 +410,8 @@ public class PricingServiceImpl implements PricingService {
 					sendMessage(orderKafkaResp);
 
 				} catch (CoCSystemException exc) {
-					logger.error("Error publishing Kafka messgae", exc);
-					throw new CoCSystemException("Error publishing Kafka messgae");
+					logger.error(ERROR_PUBLISHING_KAFKA, exc);
+					throw new CoCSystemException(ERROR_PUBLISHING_KAFKA);
 				}
 			} else {
 				logger.error(ERROR_PRODUCT_DETAIL_MISSING);
@@ -427,13 +438,18 @@ public class PricingServiceImpl implements PricingService {
 		List<OrderItem> orderItems = new ArrayList<OrderItem>();
 		List<Sku> itemDetails;
 		try {
-			itemDetails = productInfoServiceClient.getProductDetailsForSapecificItems(skuId);
+			itemDetails = productInfoServiceClient.getProductCatInfo(skuId);
 
 			itemDetails.forEach(itemDetail -> {
 				if (null != itemDetail.getId()) {
 				OrderItem orderItem = new OrderItem();
-				orderItem.setSalePrice(new Double(itemDetail.getSaleprice()));
-				orderItem.setListPrice(new Double(itemDetail.getListprice()));
+				//itemDetail.getPrice()
+					List<Price> priceList = itemDetail.getPrice();
+					Map<String, Double> itemPriceMap = priceList.stream()
+							.collect(Collectors.toMap(Price::getType, Price::getValue));
+
+					orderItem.setSalePrice(itemPriceMap.get("salePrices"));
+					orderItem.setListPrice(new Double(itemPriceMap.get("listPrices")));
 				orderItem.setSkuId(itemDetail.getId());
 				orderItem.setProductId(itemDetail.getParentproductid());
 				orderItem.setItemDescription(itemDetail.getDescription());
@@ -576,8 +592,13 @@ public class PricingServiceImpl implements PricingService {
 		OrderEvent orderEvent = new OrderEvent();
 		Set<Sku> promoskuList = new HashSet<Sku>();
 		orderItems.forEach(orderItem -> {
+			List<Price> priceList = new ArrayList<Price>();
+			Price listPrice = new Price();
+			listPrice.setType("listPrices");
+			priceList.add(listPrice);
+			listPrice.setValue(orderItem.getListPrice());
 			Sku promoSku = new Sku();
-			promoSku.setListprice(orderItem.getListPrice());
+			promoSku.setPrice(priceList);
 			promoSku.setId(orderItem.getSkuId());
 			promoSku.setName(orderItem.getName());
 			promoSku.setFulfillment(orderItem.getShippingMethod());

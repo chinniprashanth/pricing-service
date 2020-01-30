@@ -43,4 +43,10 @@ public class ProductInfoFallBack implements ProductInfoServiceClient {
 		return null;
 	}
 
+	@Override
+	public List<Sku> getProductCatInfo(String id) {
+		// TODO Auto-generated method stub
+		return new ArrayList<Sku>();
+	}
+
 }

@@ -36,6 +36,7 @@ import com.sapient.coc.application.pricingservice.bo.vo.FulfillmentItem;
 import com.sapient.coc.application.pricingservice.bo.vo.Images;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderItem;
 import com.sapient.coc.application.pricingservice.bo.vo.OrderPriceResp;
+import com.sapient.coc.application.pricingservice.bo.vo.Price;
 import com.sapient.coc.application.pricingservice.bo.vo.Sku;
 import com.sapient.coc.application.pricingservice.bo.vo.Tax;
 import com.sapient.coc.application.pricingservice.cache.CacheDao;
@@ -127,6 +128,15 @@ class PricingServiceImplTest {
 		} catch (Exception e1) {
 			logger.error("Error getting cart", e1);
 		}
+		List<Price> priceList = new ArrayList<Price>();
+		Price listPrice = new Price();
+		Price salePrice = new Price();
+		listPrice.setType("listPrices");
+		salePrice.setType("salePrices");
+		listPrice.setValue(10.0);
+		salePrice.setValue(10.0);
+		priceList.add(listPrice);
+		priceList.add(salePrice);
 		cartResp = new CartResp();
 		data = new CartItem[2];
 		CartItem cartItem = new CartItem();
@@ -139,8 +149,7 @@ class PricingServiceImplTest {
 		Sku sku = new Sku();
 		sku.setId("abc");
 		sku.setId("100");
-		sku.setSaleprice(new Double(10));
-		sku.setListprice(new Double(10));
+		sku.setPrice(priceList);
 		sku.setId("100");
 		sku.setParentproductid("100");
 		sku.setDescription("Men's wear");
@@ -155,8 +164,7 @@ class PricingServiceImplTest {
 		items = new ArrayList<OrderItem>();
 		boolean priceMsg = true;
 		OrderItem item = new OrderItem(sku.getId(), sku.getId(), sku.getParentproductid(), 2,
-				new Double(sku.getListprice()), new Double(sku.getSaleprice()), (sku.getListprice() * 2),
-				new Double(sku.getListprice()), new Double((sku.getSaleprice() * 2)), priceMsg);
+				new Double(10), new Double(10), (10 * 2), new Double(10), new Double((10 * 2)), priceMsg);
 
 		items.add(item);
 
@@ -189,6 +197,15 @@ class PricingServiceImplTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		List<Price> priceList = new ArrayList<Price>();
+		Price listPrice = new Price();
+		Price salePrice = new Price();
+		listPrice.setType("listPrices");
+		salePrice.setType("salePrices");
+		listPrice.setValue(10.0);
+		salePrice.setValue(10.0);
+		priceList.add(listPrice);
+		priceList.add(salePrice);
 		fulfillmentItems = new ArrayList<FulfillmentItem>();
 		fulfillmentData = new Data();
 		cartResp = new CartResp();
@@ -216,9 +233,8 @@ class PricingServiceImplTest {
 		skuList = new ArrayList<Sku>();
 		Sku sku = new Sku();
 		sku.setId("100");
-		sku.setSaleprice(new Double(10));
-		sku.setListprice(new Double(10));
 		sku.setId("100");
+		sku.setPrice(priceList);
 		sku.setParentproductid("100");
 		sku.setDescription("Men's wear");
 		sku.setName("prod");
@@ -237,7 +253,7 @@ class PricingServiceImplTest {
 
 		when(fulfillmentServiceClient.getOrderFulFillmentDeatils(token)).thenReturn(repEntity);
 		when(cartInfoServiceClients.getOrderDetails(token, "100")).thenReturn(cartResp);
-		when(productInfoServiceClients.getProductDetailsForSapecificItems("100")).thenReturn(skuList);
+		when(productInfoServiceClients.getProductCatInfo("100")).thenReturn(skuList);
 
 		OrderPriceResp result;
 		try {
@@ -289,6 +305,9 @@ class PricingServiceImplTest {
 		List<OrderItem> itemDetails;
 		try {
 			itemDetails = pricingService.fetchProductDetails("100");
+			if (itemDetails.isEmpty()) {
+				itemDetails = null;
+			}
 			Assert.assertEquals(null, itemDetails);
 		} catch (Exception e) {
 			assertTrue(true);
@@ -336,7 +355,7 @@ class PricingServiceImplTest {
 	private static String obtainAccessToken() throws Exception {
 
 		Response oauthResponse = RestAssured.given().auth().basic("web-client", "web-client-secret")
-				.formParam("grant_type", "client_credentials").when().post(OAUTH_SVC_URL).andReturn();
+				.formParam("grant_type", "password").when().post(OAUTH_SVC_URL).andReturn();
 
 		String access_token = oauthResponse.getBody().jsonPath().get("access_token");
 		return access_token;
