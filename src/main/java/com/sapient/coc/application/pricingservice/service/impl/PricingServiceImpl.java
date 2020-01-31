@@ -123,7 +123,6 @@ public class PricingServiceImpl implements PricingService {
 	@Value(value = "${application.promoEnabled.allowed}")
 	private boolean promotionEnabled ;
 
-	private boolean productDetailNotAvailable = false;
 	private static String orderId = null;
 
 	/**
@@ -189,12 +188,9 @@ public class PricingServiceImpl implements PricingService {
 							orderItem.setPriceChanged(false);
 						}
 						orderItems.add(orderItem);
-						} else {
-							productDetailNotAvailable = true;
-
 						}
 					});
-					if (productDetailNotAvailable) {
+					if (itemDetails.size() != orderItems.size()) {
 						logger.error(ERROR_PRODUCT_DETAIL_MISSING);
 						throw new CoCSystemException(ERROR_PRODUCT_DETAIL_MISSING);
 					}
@@ -288,7 +284,6 @@ public class PricingServiceImpl implements PricingService {
 		OrderPriceResp orderResp = new OrderPriceResp();
 		OrderKafkaResponse orderKafkaResp = null;
 		ResponseEntity<Fulfillment> fulfillmentResp;
-		productDetailNotAvailable = false;
 		try {
 			if (requestOrderId != null) {
 				fulfillmentResp = fulfillmentServiceClient.getOrderFulFillmentDeatils(token, requestOrderId);
@@ -320,7 +315,7 @@ public class PricingServiceImpl implements PricingService {
 			});
 			String ids = skuIds.stream().collect(Collectors.joining(","));
 			List<OrderItem> orderItems = fetchProductDetails(ids);
-			if (productDetailNotAvailable) {
+			if (orderItems.size() != itemList.size()) {
 				logger.error(ERROR_PRODUCT_DETAIL_MISSING);
 				throw new CoCBusinessException(ERROR_PRODUCT_DETAIL_MISSING);
 			}
@@ -447,8 +442,6 @@ public class PricingServiceImpl implements PricingService {
 				orderItem.setImageUrl(itemDetail.getImages().get(0).getUrl());
 				orderItem.setItemId(itemDetail.getId());
 					orderItems.add(orderItem);
-				} else {
-					productDetailNotAvailable = true;
 				}
 			});
 		} catch (Exception exc) {
